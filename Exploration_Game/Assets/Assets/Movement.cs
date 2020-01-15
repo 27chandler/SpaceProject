@@ -7,10 +7,12 @@ using UnityEngine.Tilemaps;
 public class Movement : MonoBehaviour
 {
     [SerializeField] private Tilemap ship_floor_tilemap;
+    [SerializeField] private float anchor_constant;
 
     private Rigidbody2D rb;
 
     private Rigidbody2D parent_rigidbody;
+    private float parent_speed = 0.0f;
 
     private Vector2 last_frame_anchor;
     private Vector2 ship_anchor;
@@ -18,6 +20,8 @@ public class Movement : MonoBehaviour
     private bool on_ship_floor = false;
 
     private float current_rotation = 0.0f;
+
+    [SerializeField] private bool do_relative_movement;
 
     [SerializeField] private float movement_speed, rotation_speed, drag_force, relative_constant;
     [Space]
@@ -38,24 +42,30 @@ public class Movement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        bool has_moved_this_frame = false;
+
         if (Input.GetKey(up_key))
         {
             rb.AddRelativeForce(Vector3.up * movement_speed);
+            has_moved_this_frame = true;
         }
 
         if (Input.GetKey(down_key))
         {
             rb.AddRelativeForce((-Vector3.up) * movement_speed);
+            has_moved_this_frame = true;
         }
 
         if (Input.GetKey(left_key))
         {
             rb.AddRelativeForce((-Vector3.right) * movement_speed);
+            has_moved_this_frame = true;
         }
 
         if (Input.GetKey(right_key))
         {
             rb.AddRelativeForce(Vector3.right * movement_speed);
+            has_moved_this_frame = true;
         }
 
         //
@@ -71,54 +81,70 @@ public class Movement : MonoBehaviour
             rb.AddTorque(rotation_speed);
             current_rotation += rotation_speed;
         }
+
+        //if (has_moved_this_frame && parent_rigidbody != null)
+        //{
+        //    Set_Anchor_Point();
+        //}
     }
 
     private void FixedUpdate()
     {
-        if ((parent_rigidbody == null) || (!on_ship_floor))
+        if (do_relative_movement)
         {
-            rb.AddForce(-(rb.velocity * drag_force));
-        }
-
-        if (parent_rigidbody != null)
-        {
-            Vector3Int ship_floor_pos = new Vector3Int();
-            Vector2 conversion_pos = parent_rigidbody.GetPoint(new Vector2(transform.position.x, transform.position.y));
-            ship_floor_pos.x = Mathf.FloorToInt(conversion_pos.x);
-            ship_floor_pos.y = Mathf.FloorToInt(conversion_pos.y);
-
-            if (ship_floor_tilemap.GetTile(ship_floor_pos) != null)
+            if (parent_rigidbody != null)
             {
-                on_ship_floor = true;
-            }
-            else
-            {
-                on_ship_floor = false;
-            }
+                parent_speed = parent_rigidbody.velocity.magnitude;
 
-            if (on_ship_floor)
-            {
-                if (last_frame_anchor != parent_rigidbody.GetRelativePoint(ship_anchor))
+                Vector3Int ship_floor_pos = new Vector3Int();
+                Vector2 conversion_pos = parent_rigidbody.GetPoint(new Vector2(transform.position.x, transform.position.y));
+                ship_floor_pos.x = Mathf.FloorToInt(conversion_pos.x);
+                ship_floor_pos.y = Mathf.FloorToInt(conversion_pos.y);
+
+                if (ship_floor_tilemap.GetTile(ship_floor_pos) != null)
                 {
-                    if (is_anchor_point_set)
+                    if (!on_ship_floor)
                     {
-                        rb.velocity = ((parent_rigidbody.GetRelativePoint(ship_anchor) - last_frame_anchor) * 50.0f);
-                        rb.angularVelocity = parent_rigidbody.angularVelocity;
+                        last_frame_anchor = parent_rigidbody.GetRelativePoint(ship_anchor);
+                        Set_Anchor_Point();
                     }
-                    else
-                    {
-                        is_anchor_point_set = true;
-                    }
-
-                    last_frame_anchor = parent_rigidbody.GetRelativePoint(ship_anchor);
+                    on_ship_floor = true;
+                }
+                else
+                {
+                    on_ship_floor = false;
                 }
 
-                if (Vector2.Distance(parent_rigidbody.GetRelativePoint(ship_anchor), transform.position) > 0.1f)
+                if (on_ship_floor)
                 {
-                    Set_Anchor_Point();
-                    is_anchor_point_set = false;
-                    Debug.Log("Re-Anchored");
+                    if (last_frame_anchor != parent_rigidbody.GetRelativePoint(ship_anchor))
+                    {
+                        if (is_anchor_point_set)
+                        {
+                            rb.velocity = ((parent_rigidbody.GetRelativePoint(ship_anchor) - last_frame_anchor) * anchor_constant);
+                            rb.angularVelocity = parent_rigidbody.angularVelocity;
+                        }
+                        else
+                        {
+                            is_anchor_point_set = true;
+                        }
+
+                        last_frame_anchor = parent_rigidbody.GetRelativePoint(ship_anchor);
+                    }
+
+                    if (Vector2.Distance(parent_rigidbody.GetRelativePoint(ship_anchor), transform.position) > 0.5f)
+                    {
+                        Set_Anchor_Point();
+                        is_anchor_point_set = false;
+                    
+                    }
                 }
+            }
+
+            if ((parent_rigidbody == null) || (!on_ship_floor))
+            {
+                rb.AddForce(-(rb.velocity * drag_force));
+                Debug.Log("Drag: PARENT SPEED: " + parent_speed + " PLAYER SPEED: " + rb.velocity.magnitude);
             }
         }
     }
@@ -132,6 +158,7 @@ public class Movement : MonoBehaviour
 
     private void Set_Anchor_Point()
     {
+        Debug.Log("Re-Anchored");
         ship_anchor = parent_rigidbody.GetPoint(rb.position);
     }
 }
