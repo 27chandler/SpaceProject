@@ -7,6 +7,8 @@ using UnityEngine.Tilemaps;
 public class Movement : MonoBehaviour
 {
     [SerializeField] private Tilemap ship_floor_tilemap;
+    [SerializeField] private Tilemap floor_tilemap;
+
     [SerializeField] private float anchor_constant;
 
     private Rigidbody2D rb;
@@ -17,7 +19,7 @@ public class Movement : MonoBehaviour
     private Vector2 last_frame_anchor;
     private Vector2 ship_anchor;
     private bool is_anchor_point_set = false;
-    private bool on_ship_floor = false;
+    private bool on_ship_floor,on_floor = false;
 
     private float current_rotation = 0.0f;
 
@@ -42,30 +44,24 @@ public class Movement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        bool has_moved_this_frame = false;
-
         if (Input.GetKey(up_key))
         {
             rb.AddRelativeForce(Vector3.up * movement_speed);
-            has_moved_this_frame = true;
         }
 
         if (Input.GetKey(down_key))
         {
             rb.AddRelativeForce((-Vector3.up) * movement_speed);
-            has_moved_this_frame = true;
         }
 
         if (Input.GetKey(left_key))
         {
             rb.AddRelativeForce((-Vector3.right) * movement_speed);
-            has_moved_this_frame = true;
         }
 
         if (Input.GetKey(right_key))
         {
             rb.AddRelativeForce(Vector3.right * movement_speed);
-            has_moved_this_frame = true;
         }
 
         //
@@ -90,18 +86,31 @@ public class Movement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        Vector3Int floor_pos = new Vector3Int();
+        floor_pos.x = Mathf.FloorToInt(transform.position.x);
+        floor_pos.y = Mathf.FloorToInt(transform.position.y);
+
+        if (floor_tilemap.GetTile(floor_pos) != null)
+        {
+            on_floor = true;
+        }
+        else
+        {
+            on_floor = false;
+        }
+
+
         if (do_relative_movement)
         {
             if (parent_rigidbody != null)
             {
                 parent_speed = parent_rigidbody.velocity.magnitude;
 
-                Vector3Int ship_floor_pos = new Vector3Int();
                 Vector2 conversion_pos = parent_rigidbody.GetPoint(new Vector2(transform.position.x, transform.position.y));
-                ship_floor_pos.x = Mathf.FloorToInt(conversion_pos.x);
-                ship_floor_pos.y = Mathf.FloorToInt(conversion_pos.y);
+                floor_pos.x = Mathf.FloorToInt(conversion_pos.x);
+                floor_pos.y = Mathf.FloorToInt(conversion_pos.y);
 
-                if (ship_floor_tilemap.GetTile(ship_floor_pos) != null)
+                if (ship_floor_tilemap.GetTile(floor_pos) != null)
                 {
                     if (!on_ship_floor)
                     {
@@ -141,10 +150,14 @@ public class Movement : MonoBehaviour
                 }
             }
 
-            if ((parent_rigidbody == null) || (!on_ship_floor))
+            //if ((parent_rigidbody == null) || (!on_ship_floor))
+            //{
+            //    rb.AddForce(-(rb.velocity * drag_force));
+            //}
+
+            if (on_floor)
             {
                 rb.AddForce(-(rb.velocity * drag_force));
-                Debug.Log("Drag: PARENT SPEED: " + parent_speed + " PLAYER SPEED: " + rb.velocity.magnitude);
             }
         }
     }
@@ -152,8 +165,12 @@ public class Movement : MonoBehaviour
     public void Set_Parent(Rigidbody2D i_rb)
     {
         parent_rigidbody = i_rb;
-        last_frame_anchor = parent_rigidbody.GetRelativePoint(ship_anchor);
-        Set_Anchor_Point();
+
+        if (i_rb != null)
+        {
+            last_frame_anchor = parent_rigidbody.GetRelativePoint(ship_anchor);
+            Set_Anchor_Point();
+        }
     }
 
     private void Set_Anchor_Point()

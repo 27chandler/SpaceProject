@@ -16,6 +16,7 @@ public class Door : Energy_Receptor
     private TileBase open_door;
     private TileBase closed_door;
     private Tilemap target_tilemap;
+    private Grid tile_grid;
 
     public Door(Vector3Int i_tile_pos,Tilemap i_tilemap) : base(i_tile_pos)
     {
@@ -33,6 +34,8 @@ public class Door : Energy_Receptor
         {
             target_tilemap.SetTile(position, closed_door);
         }
+
+        tile_grid = target_tilemap.GetComponentInParent<Grid>();
     }
 
     private void Get_Player()
@@ -49,14 +52,15 @@ public class Door : Energy_Receptor
 
         if (is_open)
         {
-            if (Vector3.Distance(player_transform.position,position) > activation_distance)
+
+            if (Vector3.Distance(player_transform.position, tile_grid.CellToWorld(position)) > activation_distance)
             {
                 Activate(activation_cost);
             }
         }
         else
         {
-            if (Vector3.Distance(player_transform.position, position) <= activation_distance)
+            if (Vector3.Distance(player_transform.position, tile_grid.CellToWorld(position)) <= activation_distance)
             {
                 Activate(activation_cost);
             }

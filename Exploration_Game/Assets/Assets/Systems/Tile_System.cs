@@ -6,6 +6,7 @@ using UnityEngine.Tilemaps;
 public class Tile_System : MonoBehaviour
 {
     private Tilemap target_tilemap;
+    [SerializeField] public bool is_ship_mode;
 
     protected Dictionary<string,List<TileBase>> system_tiles = new Dictionary<string, List<TileBase>>();
 

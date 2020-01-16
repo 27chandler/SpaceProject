@@ -22,8 +22,6 @@ public class Energy_System : Tile_System
         public bool has_changed_this_step;
     }
 
-    //[SerializeField] private Tilemap wire_tilemap;
-    [SerializeField] private Tilemap generator_tilemap;
     [Space]
     [SerializeField] private float energy_burst_interval;
     [SerializeField] private float energy_step_interval;
@@ -43,36 +41,6 @@ public class Energy_System : Tile_System
     void Start()
     {
         tm = GameObject.FindGameObjectWithTag("TileManager").GetComponent<Tile_Manager>();
-
-        //Tilemap check_tilemap = tm.Grab_Layer(system_tiles["Transmitters"][0]);
-
-        //foreach (var tile_pos in check_tilemap.cellBounds.allPositionsWithin)
-        //{
-        //    if (Check_Tiletype(system_tiles["Transmitters"], check_tilemap.GetTile(tile_pos)))
-        //    {
-        //        energy_dictionary.Add(tile_pos, Create_Energy_Tile());
-        //    }
-        //}
-
-        //check_tilemap = tm.Grab_Layer(system_tiles["Generators"][0]);
-
-        //foreach (var tile_pos in check_tilemap.cellBounds.allPositionsWithin)
-        //{
-        //    if (Check_Tiletype(system_tiles["Generators"], check_tilemap.GetTile(tile_pos)))
-        //    {
-        //        generator_dictionary.Add(tile_pos, 1);
-        //    }
-        //}
-
-        //check_tilemap = tm.Grab_Layer(system_tiles["Receptors"][0]);
-
-        //foreach (var tile_pos in check_tilemap.cellBounds.allPositionsWithin)
-        //{
-        //    if (Check_Tiletype(system_tiles["Receptors"], check_tilemap.GetTile(tile_pos)))
-        //    {
-        //        receptor_dictionary.Add(tile_pos, new Door(tile_pos, check_tilemap));
-        //    }
-        //}
     }
 
     public Energy_Tile Grab_Data(Vector3Int i_pos)
@@ -93,7 +61,6 @@ public class Energy_System : Tile_System
             tm = GameObject.FindGameObjectWithTag("TileManager").GetComponent<Tile_Manager>();
         }
 
-        //Set_Target_Tilemap(tm.Grab_Layer(i_tile));
         if (Check_Tiletype(system_tiles["Transmitters"], i_tile))
         {
             energy_dictionary.Add(i_pos, Create_Energy_Tile());
@@ -106,7 +73,14 @@ public class Energy_System : Tile_System
         }
         else if (Check_Tiletype(system_tiles["Receptors"], i_tile))
         {
-            receptor_dictionary.Add(i_pos, new Door(i_pos, tm.Grab_Layer(i_tile)));
+            if (is_ship_mode)
+            {
+                receptor_dictionary.Add(i_pos, new Door(i_pos, tm.Grab_Ship_Layer(i_tile)));
+            }
+            else
+            {
+                receptor_dictionary.Add(i_pos, new Door(i_pos, tm.Grab_Layer(i_tile)));
+            }
             is_valid = true;
         }
 
@@ -182,7 +156,15 @@ public class Energy_System : Tile_System
         receptor_timer += Time.deltaTime;
 
         int total_energy_count = 0;
-        Tilemap colour_set_tilemap = tm.Grab_Layer(system_tiles["Transmitters"][0]);
+        Tilemap colour_set_tilemap;
+        if (is_ship_mode)
+        {
+            colour_set_tilemap = tm.Grab_Ship_Layer(system_tiles["Transmitters"][0]);
+        }
+        else
+        {
+            colour_set_tilemap = tm.Grab_Layer(system_tiles["Transmitters"][0]);
+        }
 
         foreach (var wire in energy_dictionary)
         {
