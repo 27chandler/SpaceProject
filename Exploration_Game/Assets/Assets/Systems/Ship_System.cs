@@ -6,6 +6,7 @@ using UnityEngine.Tilemaps;
 public class Ship_System : Tile_System
 {
     [SerializeField] private Rigidbody2D ship_rb;
+    private float ship_default_angular_drag;
     [SerializeField] private Movement movement;
 
     private Tile_Manager tm;
@@ -18,10 +19,10 @@ public class Ship_System : Tile_System
     private Movement ship_movement;
     [SerializeField] private List<Tilemap> ship_tilemaps = new List<Tilemap>();
 
-    private bool is_converting_to_ship = false;
+    private bool is_converting_to_ship, is_snap_in_progress = false;
     private bool is_ship = false;
 
-    private Dictionary<Vector3Int,bool> ship_tile_positions = new Dictionary<Vector3Int, bool>();
+    private Dictionary<Vector3Int, bool> ship_tile_positions = new Dictionary<Vector3Int, bool>();
 
     private void Start()
     {
@@ -32,6 +33,14 @@ public class Ship_System : Tile_System
     // Update is called once per frame
     void Update()
     {
+        if (!is_ship)
+        {
+            ship_rb.velocity = new Vector2(0.0f, 0.0f);
+            ship_rb.position = new Vector2(0.0f, 0.0f);
+            ship_rb.angularVelocity = 0.0f;
+            ship_rb.rotation = 0.0f;
+        }
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
             is_converting_to_ship = !is_converting_to_ship;
@@ -43,8 +52,8 @@ public class Ship_System : Tile_System
                 Find_Wheel();
 
                 Convert_To_Ship(wheel_pos);
-                Copy_Over(tilemaps,ship_tilemaps,0, false);
-                Copy_Touching_Layers(tilemaps, ship_tilemaps, 0,false);
+                Copy_Over(tilemaps, ship_tilemaps, 0, false);
+                Copy_Touching_Layers(tilemaps, ship_tilemaps, 0, false);
 
                 movement.Set_Parent(ship_rb);
                 ship_movement.enabled = true;
@@ -54,6 +63,31 @@ public class Ship_System : Tile_System
             }
             else if (is_ship)
             {
+                Debug.Log(ship_rb.angularVelocity);
+                if (Mathf.Abs(ship_rb.angularVelocity) > 10.0f)
+                {
+                    Debug.Log("Ship rotating too fast to dock");
+                }
+                else if (Mathf.Abs(ship_rb.velocity.magnitude) > 5.0f)
+                {
+                    Debug.Log("Ship moving too fast to dock");
+                }
+                else
+                {
+                    Rotation_Snap();
+                    is_snap_in_progress = true;
+                    ship_default_angular_drag = ship_rb.angularDrag;
+                }
+            }
+        }
+
+        if (is_snap_in_progress)
+        {
+            if (Rotation_Snap())
+            {
+                ship_rb.angularDrag = ship_default_angular_drag;
+                is_snap_in_progress = false;
+
                 Convert_To_World(wheel_pos);
                 Copy_Over(ship_tilemaps, tilemaps, 0, true);
                 Copy_Touching_Layers(ship_tilemaps, tilemaps, 0, true);
@@ -61,7 +95,7 @@ public class Ship_System : Tile_System
                 movement.Set_Parent(null);
                 ship_movement.enabled = false;
 
-                ship_rb.velocity = new Vector2(0.0f,0.0f);
+                ship_rb.velocity = new Vector2(0.0f, 0.0f);
                 ship_rb.position = new Vector2(0.0f, 0.0f);
                 ship_rb.angularVelocity = 0.0f;
                 ship_rb.rotation = 0.0f;
@@ -70,6 +104,52 @@ public class Ship_System : Tile_System
                 is_ship = false;
             }
         }
+    }
+
+    private bool Rotation_Snap()
+    {
+
+        float angle = ship_rb.rotation;
+        //Debug.Log(angle % 90.0f);
+        if (Mathf.Abs(angle) % 90.0f == 0.0f)
+        {
+            return true;
+        }
+
+        float rotation_direction = 1.0f;
+
+        if (angle < 0.0f)
+        {
+            rotation_direction = -1.0f;
+        }
+
+        ship_rb.AddTorque(-ship_rb.angularVelocity * 400.0f);
+        if (Mathf.Abs((Mathf.Abs(angle) % 90.0f)) < 5.0f)
+        {
+
+            if (Mathf.Abs((Mathf.Abs(angle) % 90.0f)) < 0.1f)
+            {
+                ship_rb.rotation = ship_rb.rotation - (angle % 90.0f);
+                return true;
+            }
+        }
+        else
+        {
+            //ship_rb.angularDrag = ship_default_angular_drag;
+        }
+        if (Mathf.Abs(angle) % 90.0f < 45.0f)
+        {
+            //ship_rb.rotation = Mathf.LerpAngle(ship_rb.rotation, ship_rb.rotation - ((Mathf.Abs(angle) % 90.0f) * rotation_direction),0.1f);
+            ship_rb.angularVelocity -= ((Mathf.Abs(angle) % 90.0f) * rotation_direction) / 70.0f;
+            // Rotate clockwise
+        }
+        else
+        {
+            ship_rb.angularVelocity += ((Mathf.Abs(angle) % 90.0f) * rotation_direction) / 70.0f;
+            // Rotate anti-clockwise
+        }
+
+        return false;
     }
 
     private void Find_Wheel()
@@ -203,7 +283,7 @@ public class Ship_System : Tile_System
         Debug.Log("Conversion finished with " + ship_tile_positions.Count + " tiles found");
     }
 
-    private void Copy_Over(List<Tilemap> i_from, List<Tilemap> i_to, int i_index,bool i_do_convert_to_world)
+    private void Copy_Over(List<Tilemap> i_from, List<Tilemap> i_to, int i_index, bool i_do_convert_to_world)
     {
         foreach (var tile in ship_tile_positions)
         {
@@ -231,7 +311,7 @@ public class Ship_System : Tile_System
         }
     }
 
-    private void Copy_Touching_Layers(List<Tilemap> i_from, List<Tilemap> i_to,int i_excluded_layer, bool i_do_convert_to_world)
+    private void Copy_Touching_Layers(List<Tilemap> i_from, List<Tilemap> i_to, int i_excluded_layer, bool i_do_convert_to_world)
     {
         foreach (var tile in ship_tile_positions)
         {
