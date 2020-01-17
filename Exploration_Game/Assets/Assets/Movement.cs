@@ -140,6 +140,11 @@ public class Movement : MonoBehaviour
                 {
                     last_frame_anchor = parent_rigidbody.GetRelativePoint(ship_anchor);
                     Set_Anchor_Point(true);
+
+                    rb.velocity = parent_rigidbody.velocity;
+                    rb.angularVelocity = parent_rigidbody.angularVelocity;
+
+                    is_anchor_point_set = false;
                 }
 
                 has_entered_ship = true;
