@@ -5,6 +5,9 @@ using UnityEngine.Tilemaps;
 
 public class Ship_System : Tile_System
 {
+    [SerializeField] private Transform player_transform;
+    [SerializeField] private Movement player_movement;
+
     [SerializeField] private Rigidbody2D ship_rb;
     private float ship_default_angular_drag;
     [SerializeField] private Movement movement;
@@ -28,6 +31,10 @@ public class Ship_System : Tile_System
     {
         tm = GameObject.FindGameObjectWithTag("TileManager").GetComponent<Tile_Manager>();
         ship_movement = ship_grid.GetComponent<Movement>();
+
+        tm.Init_Ship_Systems();
+
+        Find_Wheel();
     }
 
     // Update is called once per frame
@@ -43,40 +50,44 @@ public class Ship_System : Tile_System
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            is_converting_to_ship = !is_converting_to_ship;
-
-            if ((is_converting_to_ship) && (!is_ship))
+            Find_Wheel();
+            if (Vector2.Distance((ship_grid.CellToWorld(wheel_pos)), player_transform.position) < 1.0f)
             {
-                tm.Init_Ship_Systems();
+                is_converting_to_ship = !is_converting_to_ship;
 
-                Find_Wheel();
-
-                Convert_To_Ship(wheel_pos);
-                Copy_Over(tilemaps, ship_tilemaps, 0, false);
-                Copy_Touching_Layers(tilemaps, ship_tilemaps, 0, false);
-
-                movement.Set_Parent(ship_rb);
-                ship_movement.enabled = true;
-
-                is_converting_to_ship = false;
-                is_ship = true;
-            }
-            else if (is_ship)
-            {
-                Debug.Log(ship_rb.angularVelocity);
-                if (Mathf.Abs(ship_rb.angularVelocity) > 10.0f)
+                if ((is_converting_to_ship) && (!is_ship))
                 {
-                    Debug.Log("Ship rotating too fast to dock");
+                    tm.Init_Ship_Systems();
+
+                    Find_Wheel();
+
+                    Convert_To_Ship(wheel_pos);
+                    Copy_Over(tilemaps, ship_tilemaps, 0, false);
+                    Copy_Touching_Layers(tilemaps, ship_tilemaps, 0, false);
+
+                    movement.Set_Parent(ship_rb);
+                    ship_movement.enabled = true;
+
+                    is_converting_to_ship = false;
+                    is_ship = true;
                 }
-                else if (Mathf.Abs(ship_rb.velocity.magnitude) > 5.0f)
+                else if (is_ship)
                 {
-                    Debug.Log("Ship moving too fast to dock");
-                }
-                else
-                {
-                    Rotation_Snap();
-                    is_snap_in_progress = true;
-                    ship_default_angular_drag = ship_rb.angularDrag;
+                    Debug.Log(ship_rb.angularVelocity);
+                    if (Mathf.Abs(ship_rb.angularVelocity) > 10.0f)
+                    {
+                        Debug.Log("Ship rotating too fast to dock");
+                    }
+                    else if (Mathf.Abs(ship_rb.velocity.magnitude) > 5.0f)
+                    {
+                        Debug.Log("Ship moving too fast to dock");
+                    }
+                    else
+                    {
+                        Rotation_Snap();
+                        is_snap_in_progress = true;
+                        ship_default_angular_drag = ship_rb.angularDrag;
+                    }
                 }
             }
         }
@@ -108,9 +119,7 @@ public class Ship_System : Tile_System
 
     private bool Rotation_Snap()
     {
-
         float angle = ship_rb.rotation;
-        //Debug.Log(angle % 90.0f);
         if (Mathf.Abs(angle) % 90.0f == 0.0f)
         {
             return true;
@@ -139,7 +148,6 @@ public class Ship_System : Tile_System
         }
         if (Mathf.Abs(angle) % 90.0f < 45.0f)
         {
-            //ship_rb.rotation = Mathf.LerpAngle(ship_rb.rotation, ship_rb.rotation - ((Mathf.Abs(angle) % 90.0f) * rotation_direction),0.1f);
             ship_rb.angularVelocity -= ((Mathf.Abs(angle) % 90.0f) * rotation_direction) / 70.0f;
             // Rotate clockwise
         }
@@ -304,10 +312,6 @@ public class Ship_System : Tile_System
                 tm.Ship_Add_Tile(pos, i_from[i_index].GetTile(tile.Key));
                 tm.Remove_Tile(tile.Key, i_from[i_index].GetTile(tile.Key));
             }
-
-            //i_to[i_index].SetTile(pos, i_from[i_index].GetTile(tile.Key));
-
-            //i_from[i_index].SetTile(tile.Key, null);
         }
     }
 
