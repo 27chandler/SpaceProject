@@ -59,9 +59,7 @@ public class Inventory : MonoBehaviour
             hit_position = cursor_obj.Get_World_Position();
         }
 
-        Debug.DrawLine(transform.position, hit_position,Color.red);
         float distance = Vector2.Distance(hit_position, cursor_obj.Get_World_Position());
-        Debug.Log(distance);
 
         if (distance < 1.0f)
         {
