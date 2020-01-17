@@ -101,12 +101,16 @@ public class Movement : MonoBehaviour
         if (do_relative_movement)
         {
             Vector3Int floor_pos = new Vector3Int();
-            floor_pos.x = Mathf.FloorToInt(transform.position.x);
-            floor_pos.y = Mathf.FloorToInt(transform.position.y);
+            floor_pos.x = Mathf.RoundToInt(transform.position.x);
+            floor_pos.y = Mathf.RoundToInt(transform.position.y);
+
+            Vector3Int floor_pos_floor = new Vector3Int();
+            floor_pos_floor.x = Mathf.FloorToInt(transform.position.x);
+            floor_pos_floor.y = Mathf.FloorToInt(transform.position.y);
 
             if (parent_grid != null)
             {
-                if (ship_floor_tilemap.GetTile(parent_grid.WorldToCell(floor_pos)) != null)
+                if (ship_floor_tilemap.GetTile(parent_grid.WorldToCell(transform.position)) != null)
                 {
                     on_ship_floor = true;
                 }
@@ -120,7 +124,7 @@ public class Movement : MonoBehaviour
                 on_ship_floor = false;
             }
 
-            if (floor_tilemap.GetTile(floor_pos) != null)
+            if (floor_tilemap.GetTile(floor_pos_floor) != null)
             {
                 on_floor = true;
             }
@@ -142,8 +146,6 @@ public class Movement : MonoBehaviour
                 parent_speed = parent_rigidbody.velocity.magnitude;
 
                 Vector2 conversion_pos = parent_rigidbody.GetPoint(new Vector2(transform.position.x, transform.position.y));
-                floor_pos.x = Mathf.FloorToInt(conversion_pos.x);
-                floor_pos.y = Mathf.FloorToInt(conversion_pos.y);
 
                 if (!on_ship_floor)
                 {
@@ -195,81 +197,6 @@ public class Movement : MonoBehaviour
                 is_in_space = false;
             }
         }
-
-        //Vector3Int floor_pos = new Vector3Int();
-        //floor_pos.x = Mathf.FloorToInt(transform.position.x);
-        //floor_pos.y = Mathf.FloorToInt(transform.position.y);
-
-        //if (floor_tilemap.GetTile(floor_pos) != null)
-        //{
-        //    on_floor = true;
-        //}
-        //else
-        //{
-        //    on_floor = false;
-        //}
-
-
-        //if (do_relative_movement)
-        //{
-        //    if (parent_rigidbody != null)
-        //    {
-        //        parent_speed = parent_rigidbody.velocity.magnitude;
-
-        //        Vector2 conversion_pos = parent_rigidbody.GetPoint(new Vector2(transform.position.x, transform.position.y));
-        //        floor_pos.x = Mathf.FloorToInt(conversion_pos.x);
-        //        floor_pos.y = Mathf.FloorToInt(conversion_pos.y);
-
-        //        if (ship_floor_tilemap.GetTile(floor_pos) != null)
-        //        {
-        //            if (!on_ship_floor)
-        //            {
-        //                last_frame_anchor = parent_rigidbody.GetRelativePoint(ship_anchor);
-        //                Set_Anchor_Point(true);
-        //            }
-        //            on_ship_floor = true;
-        //        }
-        //        else
-        //        {
-        //            on_ship_floor = false;
-        //        }
-
-        //        if (on_ship_floor)
-        //        {
-        //            if (last_frame_anchor != parent_rigidbody.GetRelativePoint(ship_anchor))
-        //            {
-        //                if (is_anchor_point_set)
-        //                {
-        //                    rb.velocity = ((parent_rigidbody.GetRelativePoint(ship_anchor) - last_frame_anchor) * anchor_constant);
-        //                    rb.angularVelocity = parent_rigidbody.angularVelocity;
-        //                }
-        //                else
-        //                {
-        //                    is_anchor_point_set = true;
-        //                }
-
-        //                last_frame_anchor = parent_rigidbody.GetRelativePoint(ship_anchor);
-        //            }
-
-        //            //if (Vector2.Distance(parent_rigidbody.GetRelativePoint(ship_anchor), transform.position) > 0.5f)
-        //            //{
-        //            //    Set_Anchor_Point();
-        //            //    is_anchor_point_set = false;
-
-        //            //}
-        //        }
-        //    }
-
-        //    //if ((parent_rigidbody == null) || (!on_ship_floor))
-        //    //{
-        //    //    rb.AddForce(-(rb.velocity * drag_force));
-        //    //}
-
-        //    if (on_floor)
-        //    {
-        //        rb.AddForce(-(rb.velocity * drag_force));
-        //    }
-        //}
     }
 
     public void Set_Parent(Rigidbody2D i_rb)
