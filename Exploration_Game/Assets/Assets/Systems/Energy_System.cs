@@ -419,22 +419,4 @@ public class Energy_System : Tile_System
             }
         }
     }
-
-
-    private void OnDrawGizmos()
-    {
-        foreach (var generator in generator_dictionary)
-        {
-            Gizmos.color = Color.red;
-
-            Gizmos.DrawCube(generator.Key, new Vector3(1.0f, 1.0f, 1.0f));
-        }
-
-        foreach (var wire in energy_dictionary)
-        {
-            Gizmos.color = Color.blue;
-
-            Gizmos.DrawCube(wire.Key, new Vector3(1.0f, 1.0f, 1.0f));
-        }
-    }
 }
