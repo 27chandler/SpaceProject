@@ -12,27 +12,32 @@ public class Door : Energy_Receptor
 
     private bool is_open = false;
 
-    [SerializeField]
+    private TileBase current_tile;
     private TileBase open_door;
     private TileBase closed_door;
     private Tilemap target_tilemap;
+    private Grid tile_grid;
 
     public Door(Vector3Int i_tile_pos,Tilemap i_tilemap) : base(i_tile_pos)
     {
         tm = GameObject.FindGameObjectWithTag("TileManager").GetComponent<Tile_Manager>();
 
         target_tilemap = i_tilemap;
-        open_door = target_tilemap.GetTile(i_tile_pos);
+        open_door = tm.standard_door.inactive_tile;
         closed_door = tm.standard_door.activate_tile;
 
         if (is_open)
         {
-            target_tilemap.SetTile(position, open_door);
+            current_tile = open_door;
         }
         else
         {
-            target_tilemap.SetTile(position, closed_door);
+            current_tile = closed_door;
         }
+
+        target_tilemap.SetTile(position, current_tile);
+
+        tile_grid = target_tilemap.GetComponentInParent<Grid>();
     }
 
     private void Get_Player()
@@ -47,16 +52,31 @@ public class Door : Energy_Receptor
             Get_Player();
         }
 
+        if (target_tilemap.GetTile(position) != current_tile)
+        {
+            if (is_open)
+            {
+                current_tile = open_door;
+            }
+            else
+            {
+                current_tile = closed_door;
+            }
+
+            target_tilemap.SetTile(position, current_tile);
+        }
+
         if (is_open)
         {
-            if (Vector3.Distance(player_transform.position,position) > activation_distance)
+
+            if (Vector3.Distance(player_transform.position, tile_grid.CellToWorld(position)) > activation_distance)
             {
                 Activate(activation_cost);
             }
         }
         else
         {
-            if (Vector3.Distance(player_transform.position, position) <= activation_distance)
+            if (Vector3.Distance(player_transform.position, tile_grid.CellToWorld(position)) <= activation_distance)
             {
                 Activate(activation_cost);
             }
@@ -71,12 +91,14 @@ public class Door : Energy_Receptor
 
         if (is_open)
         {
-            target_tilemap.SetTile(position,open_door);
+            current_tile = open_door;
         }
         else
         {
-            target_tilemap.SetTile(position, closed_door);
+            current_tile = closed_door;
         }
+
+        target_tilemap.SetTile(position, current_tile);
 
         Debug.Log("Door is now: " + is_open);
         base.Activation_Behaviour();

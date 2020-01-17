@@ -38,6 +38,9 @@ public class Tile_Manager : MonoBehaviour
 
     [SerializeField] private List<Tile_Info> tile_layer_data = new List<Tile_Info>();
     [SerializeField] private List<Tile_System> tile_systems = new List<Tile_System>();
+    [Space]
+    [SerializeField] private List<Tile_Info> ship_tile_layer_data = new List<Tile_Info>();
+    [SerializeField] private List<Tile_System> ship_tile_systems = new List<Tile_System>();
 
     [Serializable]
     public struct Tile_States
@@ -52,6 +55,17 @@ public class Tile_Manager : MonoBehaviour
     {
         Add_Tile_Types_To_Systems();
         Add_World_Tiles_To_Systems();
+    }
+
+    public void Init_Ship_Systems()
+    {
+        foreach (var sys in ship_tile_systems)
+        {
+            sys.enabled = true;
+        }
+
+        Add_Ship_Tile_Types_To_Systems();
+        Add_Ship_World_Tiles_To_Systems();
     }
 
     private void Add_Tile_Types_To_Systems()
@@ -80,8 +94,34 @@ public class Tile_Manager : MonoBehaviour
                 }
             }
         }
+    }
 
+    private void Add_Ship_Tile_Types_To_Systems()
+    {
+        foreach (var tile in ship_tile_layer_data)
+        {
+            foreach (var sys in tile.system_data)
+            {
+                sys.system.Add_Tile_To_System(sys.layer_name, tile.tile);
+            }
+        }
+    }
 
+    private void Add_Ship_World_Tiles_To_Systems()
+    {
+        foreach (var tile in ship_tile_layer_data)
+        {
+            foreach (var sys in tile.system_data)
+            {
+                foreach (var tile_pos in tile.tilemap.cellBounds.allPositionsWithin)
+                {
+                    if (tile.tilemap.GetTile(tile_pos) == tile.tile)
+                    {
+                        Ship_Add_Tile(tile_pos, tile.tile);
+                    }
+                }
+            }
+        }
     }
 
 
@@ -98,13 +138,39 @@ public class Tile_Manager : MonoBehaviour
         return null;
     }
 
-    public Tilemap Grab_Systems(TileBase i_tile)
+    public Tile_System Grab_Systems(TileBase i_tile)
     {
         foreach (var info in tile_layer_data)
         {
             if (info.tile == i_tile)
             {
+                return info.system_data[0].system;
+            }
+        }
+
+        return null;
+    }
+
+    public Tilemap Grab_Ship_Layer(TileBase i_tile)
+    {
+        foreach (var info in ship_tile_layer_data)
+        {
+            if (info.tile == i_tile)
+            {
                 return info.tilemap;
+            }
+        }
+
+        return null;
+    }
+
+    public Tile_System Grab_Ship_Systems(TileBase i_tile)
+    {
+        foreach (var info in ship_tile_layer_data)
+        {
+            if (info.tile == i_tile)
+            {
+                return info.system_data[0].system;
             }
         }
 
@@ -152,6 +218,61 @@ public class Tile_Manager : MonoBehaviour
                 foreach (var sys in info.system_data)
                 {
                     sys.system.Remove_Tile(i_pos,i_tile);
+                }
+            }
+        }
+
+        if (target_tilemap != null)
+        {
+            target_tilemap.SetTile(i_pos, null);
+        }
+        else
+        {
+            Debug.LogWarning("Tilemap not found");
+        }
+    }
+
+    public void Ship_Add_Tile(Vector3Int i_pos, TileBase i_tile)
+    {
+        Tilemap target_tilemap = new Tilemap();
+
+        foreach (var info in ship_tile_layer_data)
+        {
+            if (info.tile == i_tile)
+            {
+                target_tilemap = info.tilemap;
+
+                foreach (var sys in info.system_data)
+                {
+                    sys.system.Add_Tile(i_pos, i_tile);
+                }
+            }
+        }
+
+        if (target_tilemap != null)
+        {
+            target_tilemap.SetTile(i_pos, i_tile);
+        }
+        else
+        {
+            Debug.LogWarning("Tilemap not found");
+        }
+
+    }
+
+    public void Ship_Remove_Tile(Vector3Int i_pos, TileBase i_tile)
+    {
+        Tilemap target_tilemap = new Tilemap();
+
+        foreach (var info in ship_tile_layer_data)
+        {
+            if (info.tile == i_tile)
+            {
+                target_tilemap = info.tilemap;
+
+                foreach (var sys in info.system_data)
+                {
+                    sys.system.Remove_Tile(i_pos, i_tile);
                 }
             }
         }
