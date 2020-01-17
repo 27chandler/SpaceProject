@@ -10,10 +10,12 @@ public class Ship_System : Tile_System
 
     private Tile_Manager tm;
 
+    private Vector3Int wheel_pos;
 
     [SerializeField] private List<Tilemap> tilemaps = new List<Tilemap>();
     [Space]
     [SerializeField] private Grid ship_grid;
+    private Movement ship_movement;
     [SerializeField] private List<Tilemap> ship_tilemaps = new List<Tilemap>();
 
     private bool is_converting_to_ship = false;
@@ -24,6 +26,7 @@ public class Ship_System : Tile_System
     private void Start()
     {
         tm = GameObject.FindGameObjectWithTag("TileManager").GetComponent<Tile_Manager>();
+        ship_movement = ship_grid.GetComponent<Movement>();
     }
 
     // Update is called once per frame
@@ -35,24 +38,28 @@ public class Ship_System : Tile_System
 
             if ((is_converting_to_ship) && (!is_ship))
             {
-                Convert_To_Ship(new Vector3Int(-5, 23, 0));
+                tm.Init_Ship_Systems();
+
+                Find_Wheel();
+
+                Convert_To_Ship(wheel_pos);
                 Copy_Over(tilemaps,ship_tilemaps,0, false);
                 Copy_Touching_Layers(tilemaps, ship_tilemaps, 0,false);
 
                 movement.Set_Parent(ship_rb);
-
-                tm.Init_Ship_Systems();
+                ship_movement.enabled = true;
 
                 is_converting_to_ship = false;
                 is_ship = true;
             }
             else if (is_ship)
             {
-                Convert_To_World(new Vector3Int(-5, 23, 0));
+                Convert_To_World(wheel_pos);
                 Copy_Over(ship_tilemaps, tilemaps, 0, true);
                 Copy_Touching_Layers(ship_tilemaps, tilemaps, 0, true);
 
                 movement.Set_Parent(null);
+                ship_movement.enabled = false;
 
                 ship_rb.velocity = new Vector2(0.0f,0.0f);
                 ship_rb.position = new Vector2(0.0f, 0.0f);
@@ -61,6 +68,19 @@ public class Ship_System : Tile_System
 
                 is_converting_to_ship = false;
                 is_ship = false;
+            }
+        }
+    }
+
+    private void Find_Wheel()
+    {
+        Tilemap wheel_tilemap = tm.Grab_Layer(system_tiles["Wheel"][0]);
+
+        foreach (var pos in wheel_tilemap.cellBounds.allPositionsWithin)
+        {
+            if (wheel_tilemap.GetTile(pos) == system_tiles["Wheel"][0])
+            {
+                wheel_pos = pos;
             }
         }
     }
@@ -194,10 +214,20 @@ public class Ship_System : Tile_System
                 Vector3 float_pos = ship_grid.CellToWorld(pos);
                 pos.x = Mathf.RoundToInt(float_pos.x);
                 pos.y = Mathf.RoundToInt(float_pos.y);
+
+                tm.Add_Tile(pos, i_from[i_index].GetTile(tile.Key));
+                tm.Ship_Remove_Tile(tile.Key, i_from[i_index].GetTile(tile.Key));
+
+            }
+            else
+            {
+                tm.Ship_Add_Tile(pos, i_from[i_index].GetTile(tile.Key));
+                tm.Remove_Tile(tile.Key, i_from[i_index].GetTile(tile.Key));
             }
 
-            i_to[i_index].SetTile(pos, i_from[i_index].GetTile(tile.Key));
-            i_from[i_index].SetTile(tile.Key, null);
+            //i_to[i_index].SetTile(pos, i_from[i_index].GetTile(tile.Key));
+
+            //i_from[i_index].SetTile(tile.Key, null);
         }
     }
 
@@ -219,10 +249,20 @@ public class Ship_System : Tile_System
                             Vector3 float_pos = ship_grid.CellToWorld(pos);
                             pos.x = Mathf.RoundToInt(float_pos.x);
                             pos.y = Mathf.RoundToInt(float_pos.y);
+
+                            tm.Add_Tile(pos, i_from[index].GetTile(tile.Key));
+                            tm.Ship_Remove_Tile(tile.Key, i_from[index].GetTile(tile.Key));
+                        }
+                        else
+                        {
+                            tm.Ship_Add_Tile(pos, i_from[index].GetTile(tile.Key));
+                            tm.Remove_Tile(tile.Key, i_from[index].GetTile(tile.Key));
+
                         }
 
-                        i_to[index].SetTile(pos, i_from[index].GetTile(tile.Key));
-                        i_from[index].SetTile(tile.Key, null);
+                        //i_to[index].SetTile(pos, i_from[index].GetTile(tile.Key));
+                        //tm.Grab_Systems(i_from[index].GetTile(tile.Key)).Remove_Tile(tile.Key, i_from[index].GetTile(tile.Key));
+                        //i_from[index].SetTile(tile.Key, null);
                     }
                 }
 

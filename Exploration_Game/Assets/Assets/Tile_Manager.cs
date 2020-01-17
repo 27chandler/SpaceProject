@@ -138,13 +138,13 @@ public class Tile_Manager : MonoBehaviour
         return null;
     }
 
-    public Tilemap Grab_Systems(TileBase i_tile)
+    public Tile_System Grab_Systems(TileBase i_tile)
     {
         foreach (var info in tile_layer_data)
         {
             if (info.tile == i_tile)
             {
-                return info.tilemap;
+                return info.system_data[0].system;
             }
         }
 
@@ -164,13 +164,13 @@ public class Tile_Manager : MonoBehaviour
         return null;
     }
 
-    public Tilemap Grab_Ship_Systems(TileBase i_tile)
+    public Tile_System Grab_Ship_Systems(TileBase i_tile)
     {
         foreach (var info in ship_tile_layer_data)
         {
             if (info.tile == i_tile)
             {
-                return info.tilemap;
+                return info.system_data[0].system;
             }
         }
 

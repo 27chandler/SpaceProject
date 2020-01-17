@@ -12,7 +12,7 @@ public class Door : Energy_Receptor
 
     private bool is_open = false;
 
-    [SerializeField]
+    private TileBase current_tile;
     private TileBase open_door;
     private TileBase closed_door;
     private Tilemap target_tilemap;
@@ -23,17 +23,19 @@ public class Door : Energy_Receptor
         tm = GameObject.FindGameObjectWithTag("TileManager").GetComponent<Tile_Manager>();
 
         target_tilemap = i_tilemap;
-        open_door = target_tilemap.GetTile(i_tile_pos);
+        open_door = tm.standard_door.inactive_tile;
         closed_door = tm.standard_door.activate_tile;
 
         if (is_open)
         {
-            target_tilemap.SetTile(position, open_door);
+            current_tile = open_door;
         }
         else
         {
-            target_tilemap.SetTile(position, closed_door);
+            current_tile = closed_door;
         }
+
+        target_tilemap.SetTile(position, current_tile);
 
         tile_grid = target_tilemap.GetComponentInParent<Grid>();
     }
@@ -48,6 +50,20 @@ public class Door : Energy_Receptor
         if (player_transform == null)
         {
             Get_Player();
+        }
+
+        if (target_tilemap.GetTile(position) != current_tile)
+        {
+            if (is_open)
+            {
+                current_tile = open_door;
+            }
+            else
+            {
+                current_tile = closed_door;
+            }
+
+            target_tilemap.SetTile(position, current_tile);
         }
 
         if (is_open)
@@ -75,12 +91,14 @@ public class Door : Energy_Receptor
 
         if (is_open)
         {
-            target_tilemap.SetTile(position,open_door);
+            current_tile = open_door;
         }
         else
         {
-            target_tilemap.SetTile(position, closed_door);
+            current_tile = closed_door;
         }
+
+        target_tilemap.SetTile(position, current_tile);
 
         Debug.Log("Door is now: " + is_open);
         base.Activation_Behaviour();

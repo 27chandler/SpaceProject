@@ -12,7 +12,16 @@ public class Inventory : MonoBehaviour
     [SerializeField] private Follow_Mouse cursor_obj;
     [SerializeField] private Tile_System tile_sys;
 
-    [SerializeField] private Tile_Manager.Tile_Info place_obj;
+    [SerializeField] private TileBase place_tile;
+
+    [SerializeField] private Tilemap place_tilemap;
+    [SerializeField] private Tilemap alternate_place_tilemap;
+    private Grid default_grid;
+    private Grid ship_grid;
+
+    [SerializeField] private Tilemap floor_tilemap;
+    [SerializeField] private Tilemap alternate_floor_tilemap;
+
 
     [SerializeField] private Text inventory_debug_show;
 
@@ -22,6 +31,9 @@ public class Inventory : MonoBehaviour
     void Start()
     {
         tm = GameObject.FindGameObjectWithTag("TileManager").GetComponent<Tile_Manager>();
+
+        default_grid = place_tilemap.GetComponentInParent<Grid>();
+        ship_grid = alternate_place_tilemap.GetComponentInParent<Grid>();
     }
 
     // Update is called once per frame
@@ -36,11 +48,21 @@ public class Inventory : MonoBehaviour
             rounded_cursor_pos.y = Mathf.FloorToInt(cursor_obj.Get_World_Position().y);
             rounded_cursor_pos.z = 0;
 
-            if (place_obj.tilemap.GetTile(rounded_cursor_pos) == null)
+            if (alternate_floor_tilemap.GetTile(ship_grid.WorldToCell(cursor_obj.Get_World_Position())) != null)
             {
-                tm.Add_Tile(rounded_cursor_pos, place_obj.tile);
-                tile_count--;
-                //tile_sys.Add_Tile(rounded_cursor_pos, place_obj.tile);
+                if (alternate_place_tilemap.GetTile(ship_grid.WorldToCell(cursor_obj.Get_World_Position())) == null)
+                {
+                    tm.Ship_Add_Tile(ship_grid.WorldToCell(cursor_obj.Get_World_Position()), place_tile);
+                    tile_count--;
+                }
+            }
+            else if (floor_tilemap.GetTile(default_grid.WorldToCell(cursor_obj.Get_World_Position())) != null)
+            {
+                if (place_tilemap.GetTile(default_grid.WorldToCell(cursor_obj.Get_World_Position())) == null)
+                {
+                    tm.Add_Tile(default_grid.WorldToCell(cursor_obj.Get_World_Position()), place_tile);
+                    tile_count--;
+                }
             }
         }
 
@@ -51,11 +73,21 @@ public class Inventory : MonoBehaviour
             rounded_cursor_pos.y = Mathf.FloorToInt(cursor_obj.Get_World_Position().y);
             rounded_cursor_pos.z = 0;
 
-            if (place_obj.tilemap.GetTile(rounded_cursor_pos) == place_obj.tile)
+            if (alternate_floor_tilemap.GetTile(ship_grid.WorldToCell(cursor_obj.Get_World_Position())) != null)
             {
-                tm.Remove_Tile(rounded_cursor_pos, place_obj.tile);
-                tile_count++;
-                //tile_sys.Add_Tile(rounded_cursor_pos, place_obj.tile);
+                if (alternate_place_tilemap.GetTile(ship_grid.WorldToCell(cursor_obj.Get_World_Position())) == place_tile)
+                {
+                    tm.Ship_Remove_Tile(ship_grid.WorldToCell(cursor_obj.Get_World_Position()), place_tile);
+                    tile_count++;
+                }
+            }
+            else if (floor_tilemap.GetTile(default_grid.WorldToCell(cursor_obj.Get_World_Position())) != null)
+            {
+                if (place_tilemap.GetTile(default_grid.WorldToCell(cursor_obj.Get_World_Position())) == place_tile)
+                {
+                    tm.Remove_Tile(default_grid.WorldToCell(cursor_obj.Get_World_Position()), place_tile);
+                    tile_count++;
+                }
             }
         }
     }
