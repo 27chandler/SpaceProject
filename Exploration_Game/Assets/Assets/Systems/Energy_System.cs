@@ -78,7 +78,7 @@ public class Energy_System : Tile_System
             if (tm.Check_Layer_Name(i_tile,"Wheel"))
             {
                 Debug.Log("TRIGGERED");
-                input_receptor = new Ship_Wheel(i_pos);
+                input_receptor = new Ship_Wheel(i_pos, tm.Grab_Ship_Layer(i_tile));
             }
             else
             {
@@ -160,8 +160,7 @@ public class Energy_System : Tile_System
         return temp_energy;
     }
 
-    // Update is called once per frame
-    void Update()
+    protected override void System_Update()
     {
         burst_timer += Time.deltaTime;
         step_timer += Time.deltaTime;
@@ -204,6 +203,8 @@ public class Energy_System : Tile_System
             Receptor_Update();
             receptor_timer = 0.0f;
         }
+
+        base.System_Update();
     }
 
     private void Receptor_Update()

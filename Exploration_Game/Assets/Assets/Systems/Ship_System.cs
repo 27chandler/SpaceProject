@@ -15,6 +15,7 @@ public class Ship_System : Tile_System
     private Tile_Manager tm;
 
     private Vector3Int wheel_pos;
+    public bool is_ship_control_activated = false;
 
     [SerializeField] private List<Tilemap> tilemaps = new List<Tilemap>();
     [Space]
@@ -22,7 +23,7 @@ public class Ship_System : Tile_System
     private Movement ship_movement;
     [SerializeField] private List<Tilemap> ship_tilemaps = new List<Tilemap>();
 
-    private bool is_converting_to_ship, is_snap_in_progress = false;
+    private bool is_converting_to_ship, is_snap_in_progress, is_ready_for_complete_snap = false;
     private bool is_ship = false;
 
     private Dictionary<Vector3Int, bool> ship_tile_positions = new Dictionary<Vector3Int, bool>();
@@ -37,8 +38,7 @@ public class Ship_System : Tile_System
         Find_Wheel();
     }
 
-    // Update is called once per frame
-    void Update()
+    protected override void System_Update()
     {
         if (!is_ship)
         {
@@ -48,46 +48,53 @@ public class Ship_System : Tile_System
             ship_rb.rotation = 0.0f;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (is_ship_control_activated)
         {
+
+        }
+        
+
+        if (is_ship_control_activated)
+        {
+            is_ship_control_activated = false;
             Find_Wheel();
-            if (Vector2.Distance((ship_grid.CellToWorld(wheel_pos)), player_transform.position) < 1.0f)
+
+            is_converting_to_ship = !is_converting_to_ship;
+
+            if ((is_converting_to_ship) && (!is_ship))
             {
-                is_converting_to_ship = !is_converting_to_ship;
+                tm.Init_Ship_Systems();
 
-                if ((is_converting_to_ship) && (!is_ship))
+                Find_Wheel();
+
+                Convert_To_Ship(wheel_pos);
+                Copy_Over(tilemaps, ship_tilemaps, 0, false);
+                Copy_Touching_Layers(tilemaps, ship_tilemaps, 0, false);
+
+                movement.Set_Parent(ship_rb);
+                ship_movement.enabled = true;
+                player_movement.Set_Independant_Movement(false);
+
+                is_converting_to_ship = false;
+                is_ship = true;
+            }
+            else if (is_ship)
+            {
+                Debug.Log(ship_rb.angularVelocity);
+                if (Mathf.Abs(ship_rb.angularVelocity) > 10.0f)
                 {
-                    tm.Init_Ship_Systems();
-
-                    Find_Wheel();
-
-                    Convert_To_Ship(wheel_pos);
-                    Copy_Over(tilemaps, ship_tilemaps, 0, false);
-                    Copy_Touching_Layers(tilemaps, ship_tilemaps, 0, false);
-
-                    movement.Set_Parent(ship_rb);
-                    ship_movement.enabled = true;
-
-                    is_converting_to_ship = false;
-                    is_ship = true;
+                    Debug.Log("Ship rotating too fast to dock");
                 }
-                else if (is_ship)
+                else if (Mathf.Abs(ship_rb.velocity.magnitude) > 5.0f)
                 {
-                    Debug.Log(ship_rb.angularVelocity);
-                    if (Mathf.Abs(ship_rb.angularVelocity) > 10.0f)
-                    {
-                        Debug.Log("Ship rotating too fast to dock");
-                    }
-                    else if (Mathf.Abs(ship_rb.velocity.magnitude) > 5.0f)
-                    {
-                        Debug.Log("Ship moving too fast to dock");
-                    }
-                    else
-                    {
-                        Rotation_Snap();
-                        is_snap_in_progress = true;
-                        ship_default_angular_drag = ship_rb.angularDrag;
-                    }
+                    Debug.Log("Ship moving too fast to dock");
+                }
+                else
+                {
+                    
+                    Rotation_Snap();
+                    is_snap_in_progress = true;
+                    ship_default_angular_drag = ship_rb.angularDrag;
                 }
             }
         }
@@ -105,20 +112,32 @@ public class Ship_System : Tile_System
 
                 movement.Set_Parent(null);
                 ship_movement.enabled = false;
+                player_movement.Set_Independant_Movement(true);
 
                 ship_rb.velocity = new Vector2(0.0f, 0.0f);
                 ship_rb.position = new Vector2(0.0f, 0.0f);
                 ship_rb.angularVelocity = 0.0f;
                 ship_rb.rotation = 0.0f;
 
+                ship_rb.useAutoMass = true;
                 is_converting_to_ship = false;
                 is_ship = false;
+                
             }
         }
     }
 
     private bool Rotation_Snap()
     {
+        if (is_ready_for_complete_snap)
+        {
+            is_ready_for_complete_snap = false;
+            return true;
+        }
+
+        ship_rb.useAutoMass = false;
+        ship_rb.mass = 100.0f;
+
         float angle = ship_rb.rotation;
         if (Mathf.Abs(angle) % 90.0f == 0.0f)
         {
@@ -139,7 +158,7 @@ public class Ship_System : Tile_System
             if (Mathf.Abs((Mathf.Abs(angle) % 90.0f)) < 0.1f)
             {
                 ship_rb.rotation = ship_rb.rotation - (angle % 90.0f);
-                return true;
+                is_ready_for_complete_snap = true;
             }
         }
         else
@@ -300,8 +319,8 @@ public class Ship_System : Tile_System
             if (i_do_convert_to_world)
             {
                 Vector3 float_pos = ship_grid.CellToWorld(pos);
-                pos.x = Mathf.RoundToInt(float_pos.x);
-                pos.y = Mathf.RoundToInt(float_pos.y);
+                pos.x = Mathf.FloorToInt(float_pos.x);
+                pos.y = Mathf.FloorToInt(float_pos.y);
 
                 tm.Add_Tile(pos, i_from[i_index].GetTile(tile.Key));
                 tm.Ship_Remove_Tile(tile.Key, i_from[i_index].GetTile(tile.Key));
@@ -331,8 +350,8 @@ public class Ship_System : Tile_System
                         if (i_do_convert_to_world)
                         {
                             Vector3 float_pos = ship_grid.CellToWorld(pos);
-                            pos.x = Mathf.RoundToInt(float_pos.x);
-                            pos.y = Mathf.RoundToInt(float_pos.y);
+                            pos.x = Mathf.FloorToInt(float_pos.x);
+                            pos.y = Mathf.FloorToInt(float_pos.y);
 
                             tm.Add_Tile(pos, i_from[index].GetTile(tile.Key));
                             tm.Ship_Remove_Tile(tile.Key, i_from[index].GetTile(tile.Key));
@@ -352,6 +371,22 @@ public class Ship_System : Tile_System
 
                 index++;
             }
+        }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        foreach (var tile in ship_tile_positions)
+        {
+            Vector3Int pos = tile.Key;
+
+
+            Vector3 float_pos = ship_grid.CellToWorld(pos);
+            pos.x = Mathf.FloorToInt(float_pos.x);
+            pos.y = Mathf.FloorToInt(float_pos.y);
+
+            Gizmos.color = new Color(0.0f, 0.0f, 1.0f, 0.3f);
+            Gizmos.DrawCube(pos + new Vector3(0.5f, 0.5f, -10.0f), new Vector3(1.0f, 1.0f, 1.0f));
         }
     }
 }
