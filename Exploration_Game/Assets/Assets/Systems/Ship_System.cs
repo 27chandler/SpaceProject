@@ -16,6 +16,7 @@ public class Ship_System : Tile_System
 
     private Vector3Int wheel_pos;
     public bool is_ship_control_activated = false;
+    private float engine_power = 0.0f;
 
     [SerializeField] private List<Tilemap> tilemaps = new List<Tilemap>();
     [Space]
@@ -424,6 +425,7 @@ public class Ship_System : Tile_System
 
     private void Copy_Touching_Layers(List<Tilemap> i_from, List<Tilemap> i_to, int i_excluded_layer, bool i_do_convert_to_world)
     {
+        engine_power = 0.0f;
         foreach (var tile in ship_tile_positions)
         {
             int index = 0;
@@ -446,6 +448,21 @@ public class Ship_System : Tile_System
                         }
                         else
                         {
+                            bool is_engine = false;
+
+                            foreach (var engine in system_tiles["Engines"])
+                            {
+                                if (i_from[index].GetTile(tile.Key) == engine)
+                                {
+                                    is_engine = true;
+                                }
+                            }
+
+                            if (is_engine)
+                            {
+                                engine_power += 20.0f;
+                            }
+
                             tm.Ship_Add_Tile(pos, i_from[index].GetTile(tile.Key));
                             tm.Remove_Tile(tile.Key, i_from[index].GetTile(tile.Key));
 
@@ -460,6 +477,8 @@ public class Ship_System : Tile_System
                 index++;
             }
         }
+
+        ship_movement.Set_Movement_Speed(engine_power);
     }
 
     private void OnDrawGizmosSelected()

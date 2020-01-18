@@ -42,6 +42,11 @@ public class Movement : MonoBehaviour
         has_independant_movement = i_flag;
     }
 
+    public void Set_Movement_Speed(float i_speed)
+    {
+        movement_speed = i_speed;
+    }
+
     // Start is called before the first frame update
     void Start()
     {

@@ -444,7 +444,9 @@ MonoBehaviour:
       system: {fileID: 212982171}
   - tile: {fileID: 11400000, guid: c7fbd5a936eeb264d861aa3a4299fc64, type: 2}
     tilemap: {fileID: 1507183924}
-    system_data: []
+    system_data:
+    - layer_name: Engines
+      system: {fileID: 1892769852}
   tile_systems:
   - {fileID: 212982171}
   - {fileID: 1892769852}
@@ -483,7 +485,9 @@ MonoBehaviour:
       system: {fileID: 1069010770}
   - tile: {fileID: 11400000, guid: c7fbd5a936eeb264d861aa3a4299fc64, type: 2}
     tilemap: {fileID: 650142689}
-    system_data: []
+    system_data:
+    - layer_name: Engines
+      system: {fileID: 1892769852}
   ship_tile_systems:
   - {fileID: 1069010770}
   standard_door:
