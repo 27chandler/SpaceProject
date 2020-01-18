@@ -442,6 +442,9 @@ MonoBehaviour:
       system: {fileID: 1892769852}
     - layer_name: Receptors
       system: {fileID: 212982171}
+  - tile: {fileID: 11400000, guid: c7fbd5a936eeb264d861aa3a4299fc64, type: 2}
+    tilemap: {fileID: 1507183924}
+    system_data: []
   tile_systems:
   - {fileID: 212982171}
   - {fileID: 1892769852}
@@ -478,6 +481,9 @@ MonoBehaviour:
     system_data:
     - layer_name: Receptors
       system: {fileID: 1069010770}
+  - tile: {fileID: 11400000, guid: c7fbd5a936eeb264d861aa3a4299fc64, type: 2}
+    tilemap: {fileID: 650142689}
+    system_data: []
   ship_tile_systems:
   - {fileID: 1069010770}
   standard_door:
@@ -1422,8 +1428,8 @@ Tilemap:
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Origin: {x: -14, y: -7, z: 0}
-  m_Size: {x: 45, y: 60, z: 1}
+  m_Origin: {x: -21, y: -7, z: 0}
+  m_Size: {x: 52, y: 60, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:
@@ -5997,6 +6003,8 @@ Tilemap:
     m_Data: {fileID: 11400000, guid: a0d6849510cb6ad4f94e3f76a194df7d, type: 2}
   - m_RefCount: 1
     m_Data: {fileID: 11400000, guid: 1ec29d7ae4a4d1a4ab1b83ceb23b7e25, type: 2}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   m_TileSpriteArray:
   - m_RefCount: 4
     m_Data: {fileID: -4568240311356354566, guid: c8f8fd9bce1758346aa057cf47168c1e,
@@ -6009,6 +6017,8 @@ Tilemap:
   - m_RefCount: 1
     m_Data: {fileID: 8616322127380820745, guid: c8f8fd9bce1758346aa057cf47168c1e,
       type: 3}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   m_TileMatrixArray:
   - m_RefCount: 392
     m_Data:
@@ -6033,8 +6043,8 @@ Tilemap:
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Origin: {x: -16, y: -8, z: 0}
-  m_Size: {x: 113, y: 62, z: 1}
+  m_Origin: {x: -21, y: -13, z: 0}
+  m_Size: {x: 118, y: 67, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:
