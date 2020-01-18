@@ -234,57 +234,85 @@ public class Ship_System : Tile_System
 
                 Vector3Int check_pos = pos.Key + new Vector3Int(1, 0, 0);
 
-                bool is_adjacent_empty = true;
+                bool is_adjacent_valid = false;
                 for (int i = 0; i < tilemaps.Count; i++)
                 {
                     if (tilemaps[i].GetTile(check_pos) != null)
                     {
-                        is_adjacent_empty = false;
+                        is_adjacent_valid = true;
+                    }
+                    foreach (var blocker in system_tiles["Blockers"])
+                    {
+                        if (tilemaps[i].GetTile(check_pos) == blocker)
+                        {
+                            is_adjacent_valid = false;
+                        }
                     }
                 }
-                if ((!ship_tile_positions.ContainsKey(check_pos)) && (!is_adjacent_empty))
+                if ((!ship_tile_positions.ContainsKey(check_pos)) && (is_adjacent_valid))
                 {
                     edge_tiles.Add(check_pos);
                 }
 
                 check_pos = pos.Key + new Vector3Int(-1, 0, 0);
-                is_adjacent_empty = true;
+                is_adjacent_valid = false;
                 for (int i = 0; i < tilemaps.Count; i++)
                 {
                     if (tilemaps[i].GetTile(check_pos) != null)
                     {
-                        is_adjacent_empty = false;
+                        is_adjacent_valid = true;
+                    }
+                    foreach (var blocker in system_tiles["Blockers"])
+                    {
+                        if (tilemaps[i].GetTile(check_pos) == blocker)
+                        {
+                            is_adjacent_valid = false;
+                        }
                     }
                 }
-                if ((!ship_tile_positions.ContainsKey(check_pos)) && (!is_adjacent_empty))
+                if ((!ship_tile_positions.ContainsKey(check_pos)) && (is_adjacent_valid))
                 {
                     edge_tiles.Add(check_pos);
                 }
 
                 check_pos = pos.Key + new Vector3Int(0, 1, 0);
-                is_adjacent_empty = true;
+                is_adjacent_valid = false;
                 for (int i = 0; i < tilemaps.Count; i++)
                 {
                     if (tilemaps[i].GetTile(check_pos) != null)
                     {
-                        is_adjacent_empty = false;
+                        is_adjacent_valid = true;
+                    }
+                    foreach (var blocker in system_tiles["Blockers"])
+                    {
+                        if (tilemaps[i].GetTile(check_pos) == blocker)
+                        {
+                            is_adjacent_valid = false;
+                        }
                     }
                 }
-                if ((!ship_tile_positions.ContainsKey(check_pos)) && (!is_adjacent_empty))
+                if ((!ship_tile_positions.ContainsKey(check_pos)) && (is_adjacent_valid))
                 {
                     edge_tiles.Add(check_pos);
                 }
 
                 check_pos = pos.Key + new Vector3Int(0, -1, 0);
-                is_adjacent_empty = true;
+                is_adjacent_valid = false;
                 for (int i = 0; i < tilemaps.Count; i++)
                 {
                     if (tilemaps[i].GetTile(check_pos) != null)
                     {
-                        is_adjacent_empty = false;
+                        is_adjacent_valid = true;
+                    }
+                    foreach (var blocker in system_tiles["Blockers"])
+                    {
+                        if (tilemaps[i].GetTile(check_pos) == blocker)
+                        {
+                            is_adjacent_valid = false;
+                        }
                     }
                 }
-                if ((!ship_tile_positions.ContainsKey(check_pos)) && (!is_adjacent_empty))
+                if ((!ship_tile_positions.ContainsKey(check_pos)) && (is_adjacent_valid))
                 {
                     edge_tiles.Add(check_pos);
                 }
@@ -315,7 +343,6 @@ public class Ship_System : Tile_System
         ship_tile_positions.Add(i_start_pos, true);
 
         bool is_conversion_finished = false;
-        int tilemap_index = 0;
         while (!is_conversion_finished)
         {
             List<Vector3Int> edge_tiles = new List<Vector3Int>();
@@ -324,57 +351,85 @@ public class Ship_System : Tile_System
             {
 
                 Vector3Int check_pos = pos.Key + new Vector3Int(1, 0, 0);
-                bool is_adjacent_empty = true;
-                for (int i = 0; i < tilemaps.Count; i++)
+                bool is_adjacent_valid = false;
+                for (int i = 0; i < ship_tilemaps.Count; i++)
                 {
                     if (ship_tilemaps[i].GetTile(check_pos) != null)
                     {
-                        is_adjacent_empty = false;
+                        is_adjacent_valid = true;
+                    }
+                    foreach (var blocker in system_tiles["Blockers"])
+                    {
+                        if (ship_tilemaps[i].GetTile(check_pos) == blocker)
+                        {
+                            is_adjacent_valid = false;
+                        }
                     }
                 }
-                if ((!ship_tile_positions.ContainsKey(check_pos)) && (!is_adjacent_empty))
+                if ((!ship_tile_positions.ContainsKey(check_pos)) && (is_adjacent_valid))
                 {
                     edge_tiles.Add(check_pos);
                 }
 
                 check_pos = pos.Key + new Vector3Int(-1, 0, 0);
-                is_adjacent_empty = true;
-                for (int i = 0; i < tilemaps.Count; i++)
+                is_adjacent_valid = false;
+                for (int i = 0; i < ship_tilemaps.Count; i++)
                 {
                     if (ship_tilemaps[i].GetTile(check_pos) != null)
                     {
-                        is_adjacent_empty = false;
+                        is_adjacent_valid = true;
+                    }
+                    foreach (var blocker in system_tiles["Blockers"])
+                    {
+                        if (ship_tilemaps[i].GetTile(check_pos) == blocker)
+                        {
+                            is_adjacent_valid = false;
+                        }
                     }
                 }
-                if ((!ship_tile_positions.ContainsKey(check_pos)) && (!is_adjacent_empty))
+                if ((!ship_tile_positions.ContainsKey(check_pos)) && (is_adjacent_valid))
                 {
                     edge_tiles.Add(check_pos);
                 }
 
                 check_pos = pos.Key + new Vector3Int(0, 1, 0);
-                is_adjacent_empty = true;
-                for (int i = 0; i < tilemaps.Count; i++)
+                is_adjacent_valid = false;
+                for (int i = 0; i < ship_tilemaps.Count; i++)
                 {
                     if (ship_tilemaps[i].GetTile(check_pos) != null)
                     {
-                        is_adjacent_empty = false;
+                        is_adjacent_valid = true;
+                    }
+                    foreach (var blocker in system_tiles["Blockers"])
+                    {
+                        if (ship_tilemaps[i].GetTile(check_pos) == blocker)
+                        {
+                            is_adjacent_valid = false;
+                        }
                     }
                 }
-                if ((!ship_tile_positions.ContainsKey(check_pos)) && (!is_adjacent_empty))
+                if ((!ship_tile_positions.ContainsKey(check_pos)) && (is_adjacent_valid))
                 {
                     edge_tiles.Add(check_pos);
                 }
 
                 check_pos = pos.Key + new Vector3Int(0, -1, 0);
-                is_adjacent_empty = true;
-                for (int i = 0; i < tilemaps.Count; i++)
+                is_adjacent_valid = false;
+                for (int i = 0; i < ship_tilemaps.Count; i++)
                 {
                     if (ship_tilemaps[i].GetTile(check_pos) != null)
                     {
-                        is_adjacent_empty = false;
+                        is_adjacent_valid = true;
+                    }
+                    foreach (var blocker in system_tiles["Blockers"])
+                    {
+                        if (ship_tilemaps[i].GetTile(check_pos) == blocker)
+                        {
+                            is_adjacent_valid = false;
+                        }
                     }
                 }
-                if ((!ship_tile_positions.ContainsKey(check_pos)) && (!is_adjacent_empty))
+                if ((!ship_tile_positions.ContainsKey(check_pos)) && (is_adjacent_valid))
                 {
                     edge_tiles.Add(check_pos);
                 }
@@ -448,6 +503,7 @@ public class Ship_System : Tile_System
                         }
                         else
                         {
+                            // Check if engine
                             bool is_engine = false;
 
                             foreach (var engine in system_tiles["Engines"])
@@ -467,10 +523,6 @@ public class Ship_System : Tile_System
                             tm.Remove_Tile(tile.Key, i_from[index].GetTile(tile.Key));
 
                         }
-
-                        //i_to[index].SetTile(pos, i_from[index].GetTile(tile.Key));
-                        //tm.Grab_Systems(i_from[index].GetTile(tile.Key)).Remove_Tile(tile.Key, i_from[index].GetTile(tile.Key));
-                        //i_from[index].SetTile(tile.Key, null);
                     }
                 }
 
