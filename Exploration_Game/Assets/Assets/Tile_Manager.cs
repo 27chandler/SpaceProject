@@ -83,8 +83,8 @@ public class Tile_Manager : MonoBehaviour
     {
         foreach (var tile in tile_layer_data)
         {
-            foreach (var sys in tile.system_data)
-            {
+            //foreach (var sys in tile.system_data)
+            //{
                 foreach (var tile_pos in tile.tilemap.cellBounds.allPositionsWithin)
                 {
                     if (tile.tilemap.GetTile(tile_pos) == tile.tile)
@@ -92,7 +92,7 @@ public class Tile_Manager : MonoBehaviour
                         Add_Tile(tile_pos, tile.tile);
                     }
                 }
-            }
+            //}
         }
     }
 
@@ -111,8 +111,8 @@ public class Tile_Manager : MonoBehaviour
     {
         foreach (var tile in ship_tile_layer_data)
         {
-            foreach (var sys in tile.system_data)
-            {
+            //foreach (var sys in tile.system_data)
+            //{
                 foreach (var tile_pos in tile.tilemap.cellBounds.allPositionsWithin)
                 {
                     if (tile.tilemap.GetTile(tile_pos) == tile.tile)
@@ -120,7 +120,7 @@ public class Tile_Manager : MonoBehaviour
                         Ship_Add_Tile(tile_pos, tile.tile);
                     }
                 }
-            }
+            //}
         }
     }
 
@@ -136,6 +136,22 @@ public class Tile_Manager : MonoBehaviour
         }
 
         return null;
+    }
+
+    public bool Check_Layer_Name(TileBase i_tile,string i_layername)
+    {
+        foreach (var info in tile_layer_data)
+        {
+            if (info.tile == i_tile)
+            {
+                if (!(info.system_data.FindIndex(search_string => search_string.layer_name == i_layername) < 0))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public Tile_System Grab_Systems(TileBase i_tile)

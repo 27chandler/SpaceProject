@@ -195,7 +195,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_AdditionalShaderChannelsFlag: 25
+  m_AdditionalShaderChannelsFlag: 1
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
@@ -439,6 +439,8 @@ MonoBehaviour:
     system_data:
     - layer_name: Wheel
       system: {fileID: 1892769852}
+    - layer_name: Receptors
+      system: {fileID: 212982171}
   tile_systems:
   - {fileID: 212982171}
   - {fileID: 1892769852}
@@ -472,7 +474,9 @@ MonoBehaviour:
       system: {fileID: 1069010770}
   - tile: {fileID: 11400000, guid: 1ec29d7ae4a4d1a4ab1b83ceb23b7e25, type: 2}
     tilemap: {fileID: 650142689}
-    system_data: []
+    system_data:
+    - layer_name: Receptors
+      system: {fileID: 1069010770}
   ship_tile_systems:
   - {fileID: 1069010770}
   standard_door:
@@ -1513,7 +1517,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 547480207}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.85, y: 0.56, z: 0}
+  m_LocalPosition: {x: -0.06, y: 0.42, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1218401640}
@@ -5837,7 +5841,7 @@ Tilemap:
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Origin: {x: -16, y: -8, z: 0}
-  m_Size: {x: 51, y: 62, z: 1}
+  m_Size: {x: 113, y: 62, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:
@@ -15133,10 +15137,14 @@ Tilemap:
   m_TileAssetArray:
   - m_RefCount: 979
     m_Data: {fileID: 11400000, guid: 2f143ab2271ec024c902ffb05622b1fd, type: 2}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   m_TileSpriteArray:
   - m_RefCount: 979
     m_Data: {fileID: -198470220106575658, guid: c8f8fd9bce1758346aa057cf47168c1e,
       type: 3}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   m_TileMatrixArray:
   - m_RefCount: 979
     m_Data:
@@ -15161,8 +15169,8 @@ Tilemap:
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Origin: {x: -15, y: -8, z: 0}
-  m_Size: {x: 53, y: 62, z: 1}
+  m_Origin: {x: -18, y: -11, z: 0}
+  m_Size: {x: 56, y: 65, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:

@@ -73,14 +73,26 @@ public class Energy_System : Tile_System
         }
         else if (Check_Tiletype(system_tiles["Receptors"], i_tile))
         {
-            if (is_ship_mode)
+            Energy_Receptor input_receptor;
+
+            if (tm.Check_Layer_Name(i_tile,"Wheel"))
             {
-                receptor_dictionary.Add(i_pos, new Door(i_pos, tm.Grab_Ship_Layer(i_tile)));
+                Debug.Log("TRIGGERED");
+                input_receptor = new Ship_Wheel(i_pos);
             }
             else
             {
-                receptor_dictionary.Add(i_pos, new Door(i_pos, tm.Grab_Layer(i_tile)));
+                if (is_ship_mode)
+                {
+                    input_receptor = new Door(i_pos, tm.Grab_Ship_Layer(i_tile));
+                }
+                else
+                {
+                    input_receptor = new Door(i_pos, tm.Grab_Layer(i_tile));
+                }
             }
+
+            receptor_dictionary.Add(i_pos, input_receptor);
             is_valid = true;
         }
 
