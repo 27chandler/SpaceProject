@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: Door
+  m_Name: Blocker
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 21300000, guid: efcb995efb00f2a4995021955bcbf96f, type: 3}
+  m_Sprite: {fileID: -370874611054546964, guid: c8f8fd9bce1758346aa057cf47168c1e,
+    type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1
@@ -33,4 +34,4 @@ MonoBehaviour:
     e33: 1
   m_InstancedGameObject: {fileID: 0}
   m_Flags: 1
-  m_ColliderType: 0
+  m_ColliderType: 1

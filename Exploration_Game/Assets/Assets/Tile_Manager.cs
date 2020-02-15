@@ -6,6 +6,8 @@ using UnityEngine.Tilemaps;
 
 public class Tile_Manager : MonoBehaviour
 {
+    public static bool is_inited = false;
+
     [Serializable]
     public struct Tile_Info
     {
@@ -51,10 +53,15 @@ public class Tile_Manager : MonoBehaviour
 
     [SerializeField] public Tile_States standard_door;
 
-    void OnEnable()
+    void Init()
     {
         Add_Tile_Types_To_Systems();
         Add_World_Tiles_To_Systems();
+
+        foreach (var sys in tile_systems)
+        {
+            sys.enabled = true;
+        }
     }
 
     public void Init_Ship_Systems()
@@ -83,8 +90,8 @@ public class Tile_Manager : MonoBehaviour
     {
         foreach (var tile in tile_layer_data)
         {
-            foreach (var sys in tile.system_data)
-            {
+            //foreach (var sys in tile.system_data)
+            //{
                 foreach (var tile_pos in tile.tilemap.cellBounds.allPositionsWithin)
                 {
                     if (tile.tilemap.GetTile(tile_pos) == tile.tile)
@@ -92,7 +99,7 @@ public class Tile_Manager : MonoBehaviour
                         Add_Tile(tile_pos, tile.tile);
                     }
                 }
-            }
+            //}
         }
     }
 
@@ -111,8 +118,8 @@ public class Tile_Manager : MonoBehaviour
     {
         foreach (var tile in ship_tile_layer_data)
         {
-            foreach (var sys in tile.system_data)
-            {
+            //foreach (var sys in tile.system_data)
+            //{
                 foreach (var tile_pos in tile.tilemap.cellBounds.allPositionsWithin)
                 {
                     if (tile.tilemap.GetTile(tile_pos) == tile.tile)
@@ -120,7 +127,7 @@ public class Tile_Manager : MonoBehaviour
                         Ship_Add_Tile(tile_pos, tile.tile);
                     }
                 }
-            }
+            //}
         }
     }
 
@@ -137,6 +144,35 @@ public class Tile_Manager : MonoBehaviour
 
         return null;
     }
+
+    public bool Check_Layer_Name(TileBase i_tile,string i_layername)
+    {
+        foreach (var info in tile_layer_data)
+        {
+            if (info.tile == i_tile)
+            {
+                if (!(info.system_data.FindIndex(search_string => search_string.layer_name == i_layername) < 0))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public Tile_System Get_Systems(int i_index)
+    {
+        if (i_index < tile_systems.Count)
+        {
+            return tile_systems[i_index];
+        }
+        else
+        {
+            return null;
+        }
+    }
+
 
     public Tile_System Grab_Systems(TileBase i_tile)
     {
@@ -284,6 +320,15 @@ public class Tile_Manager : MonoBehaviour
         else
         {
             Debug.LogWarning("Tilemap not found");
+        }
+    }
+
+    private void Update()
+    {
+        if (!is_inited && Input_Manager.is_inited)
+        {
+            is_inited = true;
+            Init();
         }
     }
 

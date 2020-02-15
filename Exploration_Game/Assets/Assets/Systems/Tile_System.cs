@@ -43,4 +43,17 @@ public class Tile_System : MonoBehaviour
         }
         return false;
     }
+
+    private void Update()
+    {
+        if (Tile_Manager.is_inited && Input_Manager.is_inited)
+        {
+            System_Update();
+        }
+    }
+
+    protected virtual void System_Update()
+    {
+
+    }
 }

@@ -41,52 +41,65 @@ public class Inventory : MonoBehaviour
     {
         inventory_debug_show.text = "Wires: " + tile_count;
 
-        if ((Input.GetMouseButton(0)) && (tile_count > 0))
-        {
-            Vector3Int rounded_cursor_pos = new Vector3Int();
-            rounded_cursor_pos.x = Mathf.FloorToInt(cursor_obj.Get_World_Position().x);
-            rounded_cursor_pos.y = Mathf.FloorToInt(cursor_obj.Get_World_Position().y);
-            rounded_cursor_pos.z = 0;
+        Vector3Int rounded_cursor_pos = new Vector3Int();
+        rounded_cursor_pos.x = Mathf.FloorToInt(cursor_obj.Get_World_Position().x);
+        rounded_cursor_pos.y = Mathf.FloorToInt(cursor_obj.Get_World_Position().y);
+        rounded_cursor_pos.z = 0;
 
-            if (alternate_floor_tilemap.GetTile(ship_grid.WorldToCell(cursor_obj.Get_World_Position())) != null)
-            {
-                if (alternate_place_tilemap.GetTile(ship_grid.WorldToCell(cursor_obj.Get_World_Position())) == null)
-                {
-                    tm.Ship_Add_Tile(ship_grid.WorldToCell(cursor_obj.Get_World_Position()), place_tile);
-                    tile_count--;
-                }
-            }
-            else if (floor_tilemap.GetTile(default_grid.WorldToCell(cursor_obj.Get_World_Position())) != null)
-            {
-                if (place_tilemap.GetTile(default_grid.WorldToCell(cursor_obj.Get_World_Position())) == null)
-                {
-                    tm.Add_Tile(default_grid.WorldToCell(cursor_obj.Get_World_Position()), place_tile);
-                    tile_count--;
-                }
-            }
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, rounded_cursor_pos - transform.position, Vector3.Distance(transform.position, rounded_cursor_pos));
+
+        Vector3 hit_position;
+
+        if (hit.collider != null)
+        {
+            hit_position = hit.point;
+        }
+        else
+        {
+            hit_position = cursor_obj.Get_World_Position();
         }
 
-        if (Input.GetMouseButton(1))
-        {
-            Vector3Int rounded_cursor_pos = new Vector3Int();
-            rounded_cursor_pos.x = Mathf.FloorToInt(cursor_obj.Get_World_Position().x);
-            rounded_cursor_pos.y = Mathf.FloorToInt(cursor_obj.Get_World_Position().y);
-            rounded_cursor_pos.z = 0;
+        float distance = Vector2.Distance(hit_position, cursor_obj.Get_World_Position());
 
-            if (alternate_floor_tilemap.GetTile(ship_grid.WorldToCell(cursor_obj.Get_World_Position())) != null)
+        if (distance < 1.0f)
+        {
+            if ((Input.GetMouseButton(0)) && (tile_count > 0))
             {
-                if (alternate_place_tilemap.GetTile(ship_grid.WorldToCell(cursor_obj.Get_World_Position())) == place_tile)
+                if (alternate_floor_tilemap.GetTile(ship_grid.WorldToCell(cursor_obj.Get_World_Position())) != null)
                 {
-                    tm.Ship_Remove_Tile(ship_grid.WorldToCell(cursor_obj.Get_World_Position()), place_tile);
-                    tile_count++;
+                    if (alternate_place_tilemap.GetTile(ship_grid.WorldToCell(cursor_obj.Get_World_Position())) == null)
+                    {
+                        tm.Ship_Add_Tile(ship_grid.WorldToCell(cursor_obj.Get_World_Position()), place_tile);
+                        tile_count--;
+                    }
+                }
+                else if (floor_tilemap.GetTile(default_grid.WorldToCell(cursor_obj.Get_World_Position())) != null)
+                {
+                    if (place_tilemap.GetTile(default_grid.WorldToCell(cursor_obj.Get_World_Position())) == null)
+                    {
+                        tm.Add_Tile(default_grid.WorldToCell(cursor_obj.Get_World_Position()), place_tile);
+                        tile_count--;
+                    }
                 }
             }
-            else if (floor_tilemap.GetTile(default_grid.WorldToCell(cursor_obj.Get_World_Position())) != null)
+
+            if (Input.GetMouseButton(1))
             {
-                if (place_tilemap.GetTile(default_grid.WorldToCell(cursor_obj.Get_World_Position())) == place_tile)
+                if (alternate_floor_tilemap.GetTile(ship_grid.WorldToCell(cursor_obj.Get_World_Position())) != null)
                 {
-                    tm.Remove_Tile(default_grid.WorldToCell(cursor_obj.Get_World_Position()), place_tile);
-                    tile_count++;
+                    if (alternate_place_tilemap.GetTile(ship_grid.WorldToCell(cursor_obj.Get_World_Position())) == place_tile)
+                    {
+                        tm.Ship_Remove_Tile(ship_grid.WorldToCell(cursor_obj.Get_World_Position()), place_tile);
+                        tile_count++;
+                    }
+                }
+                else if (floor_tilemap.GetTile(default_grid.WorldToCell(cursor_obj.Get_World_Position())) != null)
+                {
+                    if (place_tilemap.GetTile(default_grid.WorldToCell(cursor_obj.Get_World_Position())) == place_tile)
+                    {
+                        tm.Remove_Tile(default_grid.WorldToCell(cursor_obj.Get_World_Position()), place_tile);
+                        tile_count++;
+                    }
                 }
             }
         }
