@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.Events;
 
 public class Ship_System : Tile_System
 {
+    [SerializeField] private UnityEvent control_ship_event;
+    [SerializeField] private UnityEvent dock_ship_event;
+
     [SerializeField] private Transform player_transform;
     [SerializeField] private Movement player_movement;
 
@@ -195,6 +199,7 @@ public class Ship_System : Tile_System
 
     private void Convert_To_Ship(Vector3Int i_start_pos)
     {
+        control_ship_event.Invoke();
 
         ship_tile_positions.Add(i_start_pos, true);
 
@@ -241,12 +246,9 @@ public class Ship_System : Tile_System
                     {
                         is_adjacent_valid = true;
                     }
-                    foreach (var blocker in system_tiles["Blockers"])
+                    if (Check_Tiletype(system_tiles["Blockers"], tilemaps[i].GetTile(check_pos)))
                     {
-                        if (tilemaps[i].GetTile(check_pos) == blocker)
-                        {
-                            is_adjacent_valid = false;
-                        }
+                        is_adjacent_valid = false;
                     }
                 }
                 if ((!ship_tile_positions.ContainsKey(check_pos)) && (is_adjacent_valid))
@@ -262,12 +264,9 @@ public class Ship_System : Tile_System
                     {
                         is_adjacent_valid = true;
                     }
-                    foreach (var blocker in system_tiles["Blockers"])
+                    if (Check_Tiletype(system_tiles["Blockers"], tilemaps[i].GetTile(check_pos)))
                     {
-                        if (tilemaps[i].GetTile(check_pos) == blocker)
-                        {
-                            is_adjacent_valid = false;
-                        }
+                        is_adjacent_valid = false;
                     }
                 }
                 if ((!ship_tile_positions.ContainsKey(check_pos)) && (is_adjacent_valid))
@@ -283,12 +282,9 @@ public class Ship_System : Tile_System
                     {
                         is_adjacent_valid = true;
                     }
-                    foreach (var blocker in system_tiles["Blockers"])
+                    if (Check_Tiletype(system_tiles["Blockers"], tilemaps[i].GetTile(check_pos)))
                     {
-                        if (tilemaps[i].GetTile(check_pos) == blocker)
-                        {
-                            is_adjacent_valid = false;
-                        }
+                        is_adjacent_valid = false;
                     }
                 }
                 if ((!ship_tile_positions.ContainsKey(check_pos)) && (is_adjacent_valid))
@@ -304,12 +300,9 @@ public class Ship_System : Tile_System
                     {
                         is_adjacent_valid = true;
                     }
-                    foreach (var blocker in system_tiles["Blockers"])
+                    if (Check_Tiletype(system_tiles["Blockers"], tilemaps[i].GetTile(check_pos)))
                     {
-                        if (tilemaps[i].GetTile(check_pos) == blocker)
-                        {
-                            is_adjacent_valid = false;
-                        }
+                        is_adjacent_valid = false;
                     }
                 }
                 if ((!ship_tile_positions.ContainsKey(check_pos)) && (is_adjacent_valid))
@@ -339,6 +332,7 @@ public class Ship_System : Tile_System
 
     private void Convert_To_World(Vector3Int i_start_pos)
     {
+        dock_ship_event.Invoke();
 
         ship_tile_positions.Add(i_start_pos, true);
 
@@ -358,12 +352,9 @@ public class Ship_System : Tile_System
                     {
                         is_adjacent_valid = true;
                     }
-                    foreach (var blocker in system_tiles["Blockers"])
+                    if (Check_Tiletype(system_tiles["Blockers"], ship_tilemaps[i].GetTile(check_pos)))
                     {
-                        if (ship_tilemaps[i].GetTile(check_pos) == blocker)
-                        {
-                            is_adjacent_valid = false;
-                        }
+                        is_adjacent_valid = false;
                     }
                 }
                 if ((!ship_tile_positions.ContainsKey(check_pos)) && (is_adjacent_valid))
@@ -379,12 +370,9 @@ public class Ship_System : Tile_System
                     {
                         is_adjacent_valid = true;
                     }
-                    foreach (var blocker in system_tiles["Blockers"])
+                    if (Check_Tiletype(system_tiles["Blockers"], ship_tilemaps[i].GetTile(check_pos)))
                     {
-                        if (ship_tilemaps[i].GetTile(check_pos) == blocker)
-                        {
-                            is_adjacent_valid = false;
-                        }
+                        is_adjacent_valid = false;
                     }
                 }
                 if ((!ship_tile_positions.ContainsKey(check_pos)) && (is_adjacent_valid))
@@ -400,12 +388,9 @@ public class Ship_System : Tile_System
                     {
                         is_adjacent_valid = true;
                     }
-                    foreach (var blocker in system_tiles["Blockers"])
+                    if (Check_Tiletype(system_tiles["Blockers"], ship_tilemaps[i].GetTile(check_pos)))
                     {
-                        if (ship_tilemaps[i].GetTile(check_pos) == blocker)
-                        {
-                            is_adjacent_valid = false;
-                        }
+                        is_adjacent_valid = false;
                     }
                 }
                 if ((!ship_tile_positions.ContainsKey(check_pos)) && (is_adjacent_valid))
@@ -421,12 +406,9 @@ public class Ship_System : Tile_System
                     {
                         is_adjacent_valid = true;
                     }
-                    foreach (var blocker in system_tiles["Blockers"])
+                    if (Check_Tiletype(system_tiles["Blockers"], ship_tilemaps[i].GetTile(check_pos)))
                     {
-                        if (ship_tilemaps[i].GetTile(check_pos) == blocker)
-                        {
-                            is_adjacent_valid = false;
-                        }
+                        is_adjacent_valid = false;
                     }
                 }
                 if ((!ship_tile_positions.ContainsKey(check_pos)) && (is_adjacent_valid))
@@ -463,8 +445,8 @@ public class Ship_System : Tile_System
             if (i_do_convert_to_world)
             {
                 Vector3 float_pos = ship_grid.CellToWorld(pos);
-                pos.x = Mathf.FloorToInt(float_pos.x);
-                pos.y = Mathf.FloorToInt(float_pos.y);
+                pos.x = Mathf.RoundToInt(float_pos.x);
+                pos.y = Mathf.RoundToInt(float_pos.y);
 
                 tm.Add_Tile(pos, i_from[i_index].GetTile(tile.Key));
                 tm.Ship_Remove_Tile(tile.Key, i_from[i_index].GetTile(tile.Key));
@@ -495,8 +477,8 @@ public class Ship_System : Tile_System
                         if (i_do_convert_to_world)
                         {
                             Vector3 float_pos = ship_grid.CellToWorld(pos);
-                            pos.x = Mathf.FloorToInt(float_pos.x);
-                            pos.y = Mathf.FloorToInt(float_pos.y);
+                            pos.x = Mathf.RoundToInt(float_pos.x);
+                            pos.y = Mathf.RoundToInt(float_pos.y);
 
                             tm.Add_Tile(pos, i_from[index].GetTile(tile.Key));
                             tm.Ship_Remove_Tile(tile.Key, i_from[index].GetTile(tile.Key));
@@ -541,8 +523,8 @@ public class Ship_System : Tile_System
 
 
             Vector3 float_pos = ship_grid.CellToWorld(pos);
-            pos.x = Mathf.FloorToInt(float_pos.x);
-            pos.y = Mathf.FloorToInt(float_pos.y);
+            pos.x = Mathf.RoundToInt(float_pos.x);
+            pos.y = Mathf.RoundToInt(float_pos.y);
 
             Gizmos.color = new Color(0.0f, 0.0f, 1.0f, 0.3f);
             Gizmos.DrawCube(pos + new Vector3(0.5f, 0.5f, -10.0f), new Vector3(1.0f, 1.0f, 1.0f));
