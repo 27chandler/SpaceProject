@@ -51,13 +51,7 @@ public class Ship_System : Tile_System
             ship_rb.position = new Vector2(0.0f, 0.0f);
             ship_rb.angularVelocity = 0.0f;
             ship_rb.rotation = 0.0f;
-        }
-
-        if (is_ship_control_activated)
-        {
-
-        }
-        
+        }      
 
         if (is_ship_control_activated)
         {
@@ -71,6 +65,9 @@ public class Ship_System : Tile_System
                 tm.Init_Ship_Systems();
 
                 Find_Wheel();
+
+                Tilemap wheel_tilemap = tm.Grab_Layer(system_tiles["Wheel"][0]);
+                ship_movement.Set_Rotation(wheel_tilemap.GetTransformMatrix(wheel_pos).rotation);
 
                 ship_tile_positions.Clear();
                 Convert_To_Ship(wheel_pos);
