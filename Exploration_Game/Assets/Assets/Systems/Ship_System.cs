@@ -480,7 +480,7 @@ public class Ship_System : Tile_System
                             pos.x = Mathf.RoundToInt(float_pos.x);
                             pos.y = Mathf.RoundToInt(float_pos.y);
 
-                            tm.Add_Tile(pos, i_from[index].GetTile(tile.Key));
+                            tm.Add_Tile(pos, i_from[index].GetTile(tile.Key), ship_grid.transform.rotation);
                             tm.Ship_Remove_Tile(tile.Key, i_from[index].GetTile(tile.Key));
                         }
                         else
