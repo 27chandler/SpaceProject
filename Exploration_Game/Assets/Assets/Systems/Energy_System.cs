@@ -139,6 +139,7 @@ public class Energy_System : Tile_System
         {
             if (receptor_dictionary.ContainsKey(i_pos))
             {
+                receptor_dictionary[i_pos].Destroy();
                 receptor_dictionary.Remove(i_pos);
             }
             else

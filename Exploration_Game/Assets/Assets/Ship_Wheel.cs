@@ -32,6 +32,7 @@ public class Ship_Wheel : Energy_Receptor
 
         // Listeners
         Input_Manager.static_input["Use Wheel"].press_actions += Use_Wheel;
+        Input_Manager.static_input["Toggle Control"].press_actions += Toggle_Manual_Control;
         //
     }
 
@@ -44,6 +45,23 @@ public class Ship_Wheel : Energy_Receptor
                 Activate(activation_cost);
             }
         }
+    }
+
+    private void Toggle_Manual_Control()
+    {
+        foreach (var player in player_transforms)
+        {
+            if (Vector2.Distance(ship_grid.GetCellCenterWorld(position), player.position) < 1.0f)
+            {
+                ship_sys.Toggle_Player_Movement();
+            }
+        }
+    }
+
+    public override void Destroy()
+    {
+        Input_Manager.static_input["Use Wheel"].press_actions -= Use_Wheel;
+        Input_Manager.static_input["Toggle Control"].press_actions -= Toggle_Manual_Control;
     }
 
     public override void Tile_Update()

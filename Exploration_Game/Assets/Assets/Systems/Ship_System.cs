@@ -12,6 +12,8 @@ public class Ship_System : Tile_System
     [SerializeField] private Transform player_transform;
     [SerializeField] private Movement player_movement;
 
+    private bool player_self_movement = true;
+
     [SerializeField] private Rigidbody2D ship_rb;
     private float ship_default_angular_drag;
     [SerializeField] private Movement movement;
@@ -41,6 +43,23 @@ public class Ship_System : Tile_System
         tm.Init_Ship_Systems();
 
         Find_Wheel();
+    }
+
+    public void Toggle_Player_Movement()
+    {
+        player_self_movement = !player_self_movement;
+
+        ship_movement.Set_Independant_Movement(!player_self_movement);
+        player_movement.Set_Independant_Movement(player_self_movement);
+
+        if (player_self_movement)
+        {
+            dock_ship_event.Invoke();
+        }
+        else
+        {
+            control_ship_event.Invoke();
+        }
     }
 
     protected override void System_Update()
@@ -75,8 +94,11 @@ public class Ship_System : Tile_System
                 Copy_Touching_Layers(tilemaps, ship_tilemaps, -1, false);
 
                 movement.Set_Parent(ship_rb);
-                ship_movement.enabled = true;
-                player_movement.Set_Independant_Movement(false);
+
+
+                player_self_movement = false;
+                ship_movement.enabled = !player_self_movement;
+                player_movement.Set_Independant_Movement(player_self_movement);
 
                 is_converting_to_ship = false;
                 is_ship = true;
