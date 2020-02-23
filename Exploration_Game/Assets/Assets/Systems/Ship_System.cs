@@ -68,6 +68,7 @@ public class Ship_System : Tile_System
 
                 Tilemap wheel_tilemap = tm.Grab_Layer(system_tiles["Wheel"][0]);
                 ship_movement.Set_Rotation(wheel_tilemap.GetTransformMatrix(wheel_pos).rotation);
+                Debug.Log("Rotation: " + wheel_tilemap.GetTransformMatrix(wheel_pos).rotation);
 
                 ship_tile_positions.Clear();
                 Convert_To_Ship(wheel_pos);
@@ -420,13 +421,13 @@ public class Ship_System : Tile_System
                 pos.x = Mathf.RoundToInt(float_pos.x);
                 pos.y = Mathf.RoundToInt(float_pos.y);
 
-                tm.Add_Tile(pos, i_from[i_index].GetTile(tile.Key));
+                tm.Add_Tile(pos, i_from[i_index].GetTile(tile.Key), ship_grid.transform.rotation);
                 tm.Ship_Remove_Tile(tile.Key, i_from[i_index].GetTile(tile.Key));
 
             }
             else
             {
-                tm.Ship_Add_Tile(pos, i_from[i_index].GetTile(tile.Key));
+                tm.Ship_Add_Tile(pos, i_from[i_index].GetTile(tile.Key), i_from[i_index].GetTransformMatrix(pos).rotation);
                 tm.Remove_Tile(tile.Key, i_from[i_index].GetTile(tile.Key));
             }
         }
@@ -452,7 +453,7 @@ public class Ship_System : Tile_System
                             pos.x = Mathf.RoundToInt(float_pos.x);
                             pos.y = Mathf.RoundToInt(float_pos.y);
 
-                            tm.Add_Tile(pos, i_from[index].GetTile(tile.Key), ship_grid.transform.rotation);
+                            tm.Add_Tile(pos, i_from[index].GetTile(tile.Key), i_from[index].GetTransformMatrix(tile.Key).rotation * ship_grid.transform.rotation);
                             tm.Ship_Remove_Tile(tile.Key, i_from[index].GetTile(tile.Key));
                         }
                         else

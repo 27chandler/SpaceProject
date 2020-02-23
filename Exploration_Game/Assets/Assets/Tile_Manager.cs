@@ -307,7 +307,6 @@ public class Tile_Manager : MonoBehaviour
         {
             TileBase tile = target_tilemap.GetTile(i_pos);
             target_tilemap.SetTransformMatrix(i_pos, Matrix4x4.TRS(Vector3.zero, i_rotation, Vector3.one));
-            Debug.Log("Rotated");
         }
     }
 

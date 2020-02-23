@@ -77,7 +77,6 @@ public class Energy_System : Tile_System
 
             if (tm.Check_Layer_Name(i_tile,"Wheel"))
             {
-                Debug.Log("TRIGGERED");
                 input_receptor = new Ship_Wheel(i_pos, tm.Grab_Ship_Layer(i_tile));
             }
             else
@@ -183,8 +182,6 @@ public class Energy_System : Tile_System
             total_energy_count += wire.Value.energy_level;
         }
 
-        //Debug.Log(total_energy_count);
-
         if (burst_timer >= energy_burst_interval)
         {
             Generator_Simulate();
@@ -277,7 +274,6 @@ public class Energy_System : Tile_System
 
                 if (((change_dir & return_dir) == change_dir) && (((change_dir & i_tile.energy_origin) != i_tile.energy_origin) || (i_tile.energy_origin == DIRECTION.NULL)))
                 {
-                    //Debug.Log(change_dir);
                     i_tile.transfer_direction = change_dir;
                     has_completed = true;
                     counter = 4;
@@ -298,14 +294,10 @@ public class Energy_System : Tile_System
                 
                 if (!Send_To_Receptor(i_pos, i_tile.energy_level))
                 {
-                    Debug.Log("Energy Dissipated: " + i_tile.energy_level);
+                    //Debug.Log("Energy Dissipated: " + i_tile.energy_level);
                 }
             }
-
-            //if (change_dir )
         }
-
-        //Debug.Log(energy_dictionary[new Vector3Int(3, 0, 0)].transfer_direction);
 
         return return_dir;
     }
@@ -322,7 +314,6 @@ public class Energy_System : Tile_System
 
     private void Transfer_Energy(Vector3Int i_pos,int i_amount,DIRECTION i_dir)
     {
-        //Debug.Log(i_dir);
         Vector3Int transfer_position = new Vector3Int();
         if (i_dir == DIRECTION.UP)
         {
@@ -345,8 +336,6 @@ public class Energy_System : Tile_System
             Initiate_Transfer(energy_buffer,transfer_position, DIRECTION.RIGHT, i_dir, i_amount,true);
         }
 
-        //Debug.Log(i_dir);
-
         if (i_dir != DIRECTION.NULL) 
         {
             Initiate_Transfer(energy_subtraction_buffer,i_pos, energy_dictionary[i_pos].energy_origin, energy_dictionary[i_pos].transfer_direction,i_amount,false);
@@ -355,7 +344,6 @@ public class Energy_System : Tile_System
 
     private void Initiate_Transfer(Dictionary<Vector3Int, Energy_Tile> i_buffer, Vector3Int i_transfer_pos, DIRECTION i_origin_dir, DIRECTION i_transfer_direction, int i_delta,bool is_cumulative)
     {
-        //Debug.Log("TRANSFER");
         Energy_Tile new_tile = new Energy_Tile();
         if (is_cumulative)
         {
