@@ -209,31 +209,6 @@ public class Ship_System : Tile_System
 
             foreach (var pos in ship_tile_positions)
             {
-
-                //Vector3Int check_pos = pos.Key + new Vector3Int(1, 0, 0);
-                //if ((!ship_tile_positions.ContainsKey(check_pos)) && (tilemaps[tilemap_index].GetTile(check_pos) != null))
-                //{
-                //    edge_tiles.Add(check_pos);
-                //}
-
-                //check_pos = pos.Key + new Vector3Int(-1, 0, 0);
-                //if ((!ship_tile_positions.ContainsKey(check_pos)) && (tilemaps[tilemap_index].GetTile(check_pos) != null))
-                //{
-                //    edge_tiles.Add(check_pos);
-                //}
-
-                //check_pos = pos.Key + new Vector3Int(0, 1, 0);
-                //if ((!ship_tile_positions.ContainsKey(check_pos)) && (tilemaps[tilemap_index].GetTile(check_pos) != null))
-                //{
-                //    edge_tiles.Add(check_pos);
-                //}
-
-                //check_pos = pos.Key + new Vector3Int(0, -1, 0);
-                //if ((!ship_tile_positions.ContainsKey(check_pos)) && (tilemaps[tilemap_index].GetTile(check_pos) != null))
-                //{
-                //    edge_tiles.Add(check_pos);
-                //}
-
                 Vector3Int check_pos = pos.Key + new Vector3Int(1, 0, 0);
 
                 bool is_adjacent_valid = false;
@@ -498,7 +473,7 @@ public class Ship_System : Tile_System
                                 engine_power += 20.0f;
                             }
 
-                            tm.Ship_Add_Tile(pos, i_from[index].GetTile(tile.Key));
+                            tm.Ship_Add_Tile(pos, i_from[index].GetTile(tile.Key), i_from[index].GetTransformMatrix(pos).rotation);
                             tm.Remove_Tile(tile.Key, i_from[index].GetTile(tile.Key));
 
                         }

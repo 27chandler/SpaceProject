@@ -289,6 +289,28 @@ public class Tile_Manager : MonoBehaviour
         }
     }
 
+    public void Ship_Add_Tile(Vector3Int i_pos, TileBase i_tile, Quaternion i_rotation)
+    {
+        Ship_Add_Tile(i_pos, i_tile);
+
+        Tilemap target_tilemap = new Tilemap();
+
+        foreach (var info in ship_tile_layer_data)
+        {
+            if (info.tile == i_tile)
+            {
+                target_tilemap = info.tilemap;
+            }
+        }
+
+        if (target_tilemap != null)
+        {
+            TileBase tile = target_tilemap.GetTile(i_pos);
+            target_tilemap.SetTransformMatrix(i_pos, Matrix4x4.TRS(Vector3.zero, i_rotation, Vector3.one));
+            Debug.Log("Rotated");
+        }
+    }
+
     public void Ship_Add_Tile(Vector3Int i_pos, TileBase i_tile)
     {
         Tilemap target_tilemap = new Tilemap();
