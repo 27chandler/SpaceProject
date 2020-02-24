@@ -452,10 +452,16 @@ MonoBehaviour:
     system_data:
     - layer_name: Blockers
       system: {fileID: 1892769852}
+  - tile: {fileID: 11400000, guid: c4a7a8a4ae5f252448bb0e2a99e761f7, type: 2}
+    tilemap: {fileID: 1507183924}
+    system_data:
+    - layer_name: Spawner
+      system: {fileID: 566537205}
   tile_systems:
   - {fileID: 212982171}
   - {fileID: 1892769852}
   - {fileID: 1069010770}
+  - {fileID: 566537205}
   ship_tile_layer_data:
   - tile: {fileID: 11400000, guid: a0d6849510cb6ad4f94e3f76a194df7d, type: 2}
     tilemap: {fileID: 650142689}
@@ -498,6 +504,11 @@ MonoBehaviour:
     system_data:
     - layer_name: Blockers
       system: {fileID: 1892769852}
+  - tile: {fileID: 11400000, guid: c4a7a8a4ae5f252448bb0e2a99e761f7, type: 2}
+    tilemap: {fileID: 650142689}
+    system_data:
+    - layer_name: Spawner
+      system: {fileID: 566537205}
   ship_tile_systems:
   - {fileID: 1069010770}
   standard_door:
@@ -2173,6 +2184,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 566537204}
+  - component: {fileID: 566537205}
   m_Layer: 0
   m_Name: Swarm
   m_TagString: Untagged
@@ -2194,6 +2206,19 @@ Transform:
   m_Father: {fileID: 1527145379}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &566537205
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 566537203}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5320a68f8945a824a82904bc3cf56b0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  is_ship_mode: 0
 --- !u!1 &650142684
 GameObject:
   m_ObjectHideFlags: 0
@@ -5540,8 +5565,8 @@ Tilemap:
       m_ColliderType: 1
   - first: {x: 29, y: 13, z: 0}
     second:
-      m_TileIndex: 1
-      m_TileSpriteIndex: 1
+      m_TileIndex: 6
+      m_TileSpriteIndex: 4
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_ObjectToInstantiate: {fileID: 0}
@@ -7675,7 +7700,7 @@ Tilemap:
   m_TileAssetArray:
   - m_RefCount: 6
     m_Data: {fileID: 11400000, guid: 3f68543c942ac26439e61a1843a19445, type: 2}
-  - m_RefCount: 341
+  - m_RefCount: 340
     m_Data: {fileID: 11400000, guid: f31f49af53c1e784e9f502b879cf9d2a, type: 2}
   - m_RefCount: 16
     m_Data: {fileID: 11400000, guid: a0d6849510cb6ad4f94e3f76a194df7d, type: 2}
@@ -7685,21 +7710,21 @@ Tilemap:
     m_Data: {fileID: 11400000, guid: c7fbd5a936eeb264d861aa3a4299fc64, type: 2}
   - m_RefCount: 112
     m_Data: {fileID: 11400000, guid: 878a4ff195bc570429209dc6356b36dc, type: 2}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
+  - m_RefCount: 1
+    m_Data: {fileID: 11400000, guid: c4a7a8a4ae5f252448bb0e2a99e761f7, type: 2}
   m_TileSpriteArray:
   - m_RefCount: 6
     m_Data: {fileID: -4568240311356354566, guid: c8f8fd9bce1758346aa057cf47168c1e,
       type: 3}
-  - m_RefCount: 341
+  - m_RefCount: 340
     m_Data: {fileID: 7010935454221729576, guid: c8f8fd9bce1758346aa057cf47168c1e,
       type: 3}
   - m_RefCount: 16
     m_Data: {fileID: 21300000, guid: efcb995efb00f2a4995021955bcbf96f, type: 3}
   - m_RefCount: 46
     m_Data: {fileID: 146335173749232457, guid: c8f8fd9bce1758346aa057cf47168c1e, type: 3}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
+  - m_RefCount: 1
+    m_Data: {fileID: 21300000, guid: d5c7d29233bdaad48b43880976d6575d, type: 3}
   - m_RefCount: 112
     m_Data: {fileID: -370874611054546964, guid: c8f8fd9bce1758346aa057cf47168c1e,
       type: 3}
