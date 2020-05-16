@@ -6,6 +6,23 @@ using UnityEngine.Tilemaps;
 
 public class Tile_Manager : MonoBehaviour
 {
+    [Serializable]
+    public struct PropertyData
+    {
+        public float conductivity;
+        public float hardness;
+        public float openility;
+        public float power_generation;
+        public float thrust;
+        public float ship_blocker;
+        public float spread_value;
+    };
+
+
+    private Dictionary<Vector3Int, PropertyData> all_tiles = new Dictionary<Vector3Int, PropertyData>();
+
+    [SerializeField] private Tilemap test_tilemap;
+
     public static bool is_inited = false;
 
     [Serializable]
@@ -13,6 +30,7 @@ public class Tile_Manager : MonoBehaviour
     {
         public TileBase tile;
         public Tilemap tilemap;
+        public PropertyData property_data;
         public List<System_Layer> system_data;
     }
 
@@ -55,6 +73,8 @@ public class Tile_Manager : MonoBehaviour
 
     void Init()
     {
+        Populate_World_Dictionary();
+
         Add_Tile_Types_To_Systems();
         Add_World_Tiles_To_Systems();
 
@@ -73,6 +93,35 @@ public class Tile_Manager : MonoBehaviour
 
         Add_Ship_Tile_Types_To_Systems();
         Add_Ship_World_Tiles_To_Systems();
+    }
+
+    private void Populate_World_Dictionary()
+    {
+        foreach (var tile_pos in test_tilemap.cellBounds.allPositionsWithin)
+        {
+            all_tiles.Add(tile_pos, Grab_Property_Data(test_tilemap.GetTile(tile_pos)));
+        }
+    }
+
+    private PropertyData Grab_Property_Data(TileBase i_tile)
+    {
+        PropertyData return_data = new PropertyData();
+
+        if (i_tile == null)
+        {
+            return return_data;
+        }
+
+        foreach (var tile in tile_layer_data)
+        {
+            if (tile.tile == i_tile)
+            {
+                return tile.property_data;
+            }
+        }
+
+        Debug.LogError("Invalid tile in property data");
+        return return_data;
     }
 
     private void Add_Tile_Types_To_Systems()
@@ -98,6 +147,16 @@ public class Tile_Manager : MonoBehaviour
                     {
                         Add_Tile(tile_pos, tile.tile);
                     }
+
+
+
+                    //
+                    if (all_tiles[tile_pos].conductivity >= 1.0f)
+                    {
+                        Debug.Log("Added tile to energy");
+                        tile_systems[0].Add_Tile(tile_pos, tile.tilemap.GetTile(tile_pos));
+                    }
+                    //
                 }
             //}
         }
@@ -243,6 +302,7 @@ public class Tile_Manager : MonoBehaviour
             if (info.tile == i_tile)
             {
                 target_tilemap = info.tilemap;
+                Remove_Tile(i_pos, target_tilemap.GetTile(i_pos));
 
                 foreach (var sys in info.system_data)
                 {
@@ -319,6 +379,7 @@ public class Tile_Manager : MonoBehaviour
             if (info.tile == i_tile)
             {
                 target_tilemap = info.tilemap;
+                Ship_Remove_Tile(i_pos, target_tilemap.GetTile(i_pos));
 
                 foreach (var sys in info.system_data)
                 {
