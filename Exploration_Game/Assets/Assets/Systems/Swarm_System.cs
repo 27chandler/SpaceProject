@@ -70,15 +70,35 @@ public class Swarm_System : Tile_System
     {
         bool has_spread = false;
 
-        TileBase spawner_tile = system_tiles["Spawner"][0];
-        Tilemap spawner_tilemap = tm.Grab_Layer(spawner_tile);
+        TileBase spawner_tile;
+        Tilemap spawner_tilemap;
+
+        if (is_ship_mode)
+        {
+            spawner_tile = system_tiles["Spawner"][0];
+            spawner_tilemap = tm.Grab_Ship_Layer(spawner_tile);
+        }
+        else
+        {
+            spawner_tile = system_tiles["Spawner"][0];
+            spawner_tilemap = tm.Grab_Layer(spawner_tile);
+        }
+
+
 
         Vector3Int up_neighbour = i_pos + Vector3Int.up;
         if ((spawner_tilemap.GetTile(up_neighbour) != null) && (Count_Swarm_Neighbours(up_neighbour) < 2))
         {
             if (!swarm_dictionary.ContainsKey(up_neighbour))
             {
-                tm.Add_Tile(up_neighbour, spawner_tile);
+                if (is_ship_mode)
+                {
+                    tm.Ship_Add_Tile(up_neighbour, spawner_tile);
+                }
+                else
+                {
+                    tm.Add_Tile(up_neighbour, spawner_tile);
+                }
                 has_spread = true;
             }
         }
@@ -88,7 +108,14 @@ public class Swarm_System : Tile_System
         {
             if (!swarm_dictionary.ContainsKey(down_neighbour))
             {
-                tm.Add_Tile(down_neighbour, spawner_tile);
+                if (is_ship_mode)
+                {
+                    tm.Ship_Add_Tile(down_neighbour, spawner_tile);
+                }
+                else
+                {
+                    tm.Add_Tile(down_neighbour, spawner_tile);
+                }
                 has_spread = true;
             }
         }
@@ -98,7 +125,14 @@ public class Swarm_System : Tile_System
         {
             if (!swarm_dictionary.ContainsKey(left_neighbour))
             {
-                tm.Add_Tile(left_neighbour, spawner_tile);
+                if (is_ship_mode)
+                {
+                    tm.Ship_Add_Tile(left_neighbour, spawner_tile);
+                }
+                else
+                {
+                    tm.Add_Tile(left_neighbour, spawner_tile);
+                }
                 has_spread = true;
             }
         }
@@ -108,7 +142,14 @@ public class Swarm_System : Tile_System
         {
             if (!swarm_dictionary.ContainsKey(right_neighbour))
             {
-                tm.Add_Tile(right_neighbour, spawner_tile);
+                if (is_ship_mode)
+                {
+                    tm.Ship_Add_Tile(right_neighbour, spawner_tile);
+                }
+                else
+                {
+                    tm.Add_Tile(right_neighbour, spawner_tile);
+                }
                 has_spread = true;
             }
         }
