@@ -19,6 +19,18 @@ public class Tile_System : MonoBehaviour
         system_tiles[i_layer].Add(i_tile);
     }
 
+    public bool Check_System_Tiles(TileBase i_tile)
+    {
+        foreach (var layer in system_tiles)
+        {
+            if (layer.Value.Contains(i_tile))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public virtual void Add_Tile(Vector3Int i_pos, TileBase i_tile)
     {
     }

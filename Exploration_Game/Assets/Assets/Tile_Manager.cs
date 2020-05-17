@@ -128,8 +128,15 @@ public class Tile_Manager : MonoBehaviour
     {
         foreach (var tile in tile_layer_data)
         {
+            if (tile.property_data.conductivity >= 1.0f)
+            {
+                Debug.Log("Added tile type to energy system");
+                tile_systems[0].Add_Tile_To_System("Transmitters", tile.tile);
+            }
+
             foreach (var sys in tile.system_data)
             {
+
                 sys.system.Add_Tile_To_System(sys.layer_name, tile.tile);
             }
         }
@@ -151,11 +158,11 @@ public class Tile_Manager : MonoBehaviour
 
 
                     //
-                    if (all_tiles[tile_pos].conductivity >= 1.0f)
-                    {
-                        Debug.Log("Added tile to energy");
-                        tile_systems[0].Add_Tile(tile_pos, tile.tilemap.GetTile(tile_pos));
-                    }
+                    //if (all_tiles[tile_pos].conductivity >= 1.0f)
+                    //{
+                    //    Debug.Log("Added tile to energy");
+                    //    tile_systems[0].Add_Tile(tile_pos, tile.tilemap.GetTile(tile_pos));
+                    //}
                     //
                 }
             //}
@@ -271,6 +278,22 @@ public class Tile_Manager : MonoBehaviour
 
         return null;
     }
+
+    private List<Tile_System> Grab_Relevant_Systems(TileBase i_tile)
+    {
+        List<Tile_System> return_systems = new List<Tile_System>();
+
+        foreach (var sys in tile_systems)
+        {
+            if (sys.Check_System_Tiles(i_tile))
+            {
+                return_systems.Add(sys);
+            }
+        }
+
+        return return_systems;
+    }
+
     public void Add_Tile(Vector3Int i_pos, TileBase i_tile,Quaternion i_rotation)
     {
         Add_Tile(i_pos, i_tile);
@@ -304,9 +327,11 @@ public class Tile_Manager : MonoBehaviour
                 target_tilemap = info.tilemap;
                 Remove_Tile(i_pos, target_tilemap.GetTile(i_pos));
 
-                foreach (var sys in info.system_data)
+                List<Tile_System> systems = Grab_Relevant_Systems(i_tile);
+
+                foreach (var sys in systems)
                 {
-                    sys.system.Add_Tile(i_pos, i_tile);
+                    sys.Add_Tile(i_pos, i_tile);
                 }
             }
         }

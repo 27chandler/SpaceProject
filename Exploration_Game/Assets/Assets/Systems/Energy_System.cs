@@ -54,6 +54,7 @@ public class Energy_System : Tile_System
 
     public override void Add_Tile(Vector3Int i_pos, TileBase i_tile)
     {
+        Debug.Log("Tile added to energy");
         bool is_valid = false;
 
         if (tm == null)
@@ -179,6 +180,8 @@ public class Energy_System : Tile_System
 
         foreach (var wire in energy_dictionary)
         {
+            colour_set_tilemap.SetTileFlags(wire.Key, TileFlags.None);
+            //colour_set_tilemap.SetColor(wire.Key, Color.blue);
             colour_set_tilemap.SetColor(wire.Key, intensity_colors[wire.Value.energy_level]);
             total_energy_count += wire.Value.energy_level;
         }
@@ -419,6 +422,14 @@ public class Energy_System : Tile_System
                     energy_buffer.Add(generator.Key, new_tile);
                 }
             }
+        }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        foreach (var tile in energy_dictionary)
+        {
+            Gizmos.DrawCube(tile.Key, new Vector3(1.0f, 1.0f, 1.0f));
         }
     }
 }
