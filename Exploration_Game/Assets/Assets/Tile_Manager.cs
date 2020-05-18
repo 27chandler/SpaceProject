@@ -6,10 +6,11 @@ using UnityEngine.Tilemaps;
 
 public class Tile_Manager : MonoBehaviour
 {
+    // Stores properties for a tiletype
     [Serializable]
     public struct PropertyData
     {
-        public float conductivity;
+        public float conductivity; // Conducitivity measures if a tile can carry energy to other conductive tiles
         public float hardness;
         public float openility;
         public float power_generation;
@@ -103,6 +104,7 @@ public class Tile_Manager : MonoBehaviour
         }
     }
 
+    // Retrieves the property data for a specific tile type
     private PropertyData Grab_Property_Data(TileBase i_tile)
     {
         PropertyData return_data = new PropertyData();
@@ -130,7 +132,6 @@ public class Tile_Manager : MonoBehaviour
         {
             if (tile.property_data.conductivity >= 1.0f)
             {
-                Debug.Log("Added tile type to energy system");
                 tile_systems[0].Add_Tile_To_System("Transmitters", tile.tile);
             }
 

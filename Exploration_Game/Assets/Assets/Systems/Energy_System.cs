@@ -16,6 +16,7 @@ public class Energy_System : Tile_System
     public class Energy_Tile
     {
         public int energy_level;
+        public TileBase tiletype;
         public DIRECTION transfer_direction;
         public DIRECTION energy_origin;
 
@@ -64,7 +65,7 @@ public class Energy_System : Tile_System
 
         if (Check_Tiletype(system_tiles["Transmitters"], i_tile))
         {
-            energy_dictionary.Add(i_pos, Create_Energy_Tile());
+            energy_dictionary.Add(i_pos, Create_Energy_Tile(i_tile));
             is_valid = true;
         }
         else if (Check_Tiletype(system_tiles["Generators"], i_tile))
@@ -150,9 +151,10 @@ public class Energy_System : Tile_System
         }
     }
 
-    private Energy_Tile Create_Energy_Tile()
+    private Energy_Tile Create_Energy_Tile(TileBase i_tile)
     {
         Energy_Tile temp_energy = new Energy_Tile();
+        temp_energy.tiletype = i_tile;
         temp_energy.energy_level = 0;
         temp_energy.energy_origin = DIRECTION.NULL;
         temp_energy.transfer_direction = DIRECTION.NULL;
@@ -169,19 +171,28 @@ public class Energy_System : Tile_System
 
         int total_energy_count = 0;
         Tilemap colour_set_tilemap;
-        if (is_ship_mode)
-        {
-            colour_set_tilemap = tm.Grab_Ship_Layer(system_tiles["Transmitters"][0]);
-        }
-        else
-        {
-            colour_set_tilemap = tm.Grab_Layer(system_tiles["Transmitters"][0]);
-        }
+        //if (is_ship_mode)
+        //{
+        //    colour_set_tilemap = tm.Grab_Ship_Layer(system_tiles["Transmitters"][0]);
+        //}
+        //else
+        //{
+        //    colour_set_tilemap = tm.Grab_Layer(system_tiles["Transmitters"][0]);
+        //}
 
         foreach (var wire in energy_dictionary)
         {
+            if (is_ship_mode)
+            {
+                colour_set_tilemap = tm.Grab_Ship_Layer(wire.Value.tiletype);
+            }
+            else
+            {
+                colour_set_tilemap = tm.Grab_Layer(wire.Value.tiletype);
+            }
+
             colour_set_tilemap.SetTileFlags(wire.Key, TileFlags.None);
-            //colour_set_tilemap.SetColor(wire.Key, Color.blue);
+
             colour_set_tilemap.SetColor(wire.Key, intensity_colors[wire.Value.energy_level]);
             total_energy_count += wire.Value.energy_level;
         }
@@ -359,6 +370,7 @@ public class Energy_System : Tile_System
         }
 
         new_tile.energy_origin = i_origin_dir;
+        new_tile.tiletype = energy_dictionary[i_transfer_pos].tiletype;
         new_tile.has_changed_this_step = false;
         new_tile.transfer_direction = energy_dictionary[i_transfer_pos].transfer_direction;
 
@@ -410,6 +422,7 @@ public class Energy_System : Tile_System
             {
                 Energy_Tile new_tile = new Energy_Tile();
                 new_tile.energy_level = energy_dictionary[generator.Key].energy_level + 1;
+                new_tile.tiletype = energy_dictionary[generator.Key].tiletype;
                 new_tile.energy_origin = DIRECTION.NULL;
                 new_tile.has_changed_this_step = false;
 
