@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -83,6 +83,17 @@ public class Tile_Manager : MonoBehaviour
         {
             sys.enabled = true;
         }
+    }
+
+    public List<TileBase> Grab_All_Tiletypes()
+    {
+        List<TileBase> return_tiles = new List<TileBase>();
+
+        foreach (var tile_data in tile_layer_data)
+        {
+            return_tiles.Add(tile_data.tile);
+        }
+        return return_tiles;
     }
 
     public void Init_Ship_Systems()
