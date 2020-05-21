@@ -6,6 +6,9 @@ using UnityEngine.Tilemaps;
 
 public class Tile_Manager : MonoBehaviour
 {
+    // Enum for types of systems present in the game
+    private enum SYSTEM_ID { ENERGY = 0, SHIP = 1, SWARM = 2 };
+
     // Stores properties for a tiletype
     [Serializable]
     public struct PropertyData
@@ -143,11 +146,15 @@ public class Tile_Manager : MonoBehaviour
         {
             if (tile.property_data.conductivity >= 1.0f)
             {
-                tile_systems[0].Add_Tile_To_System("Transmitters", tile.tile);
+                tile_systems[(int)(SYSTEM_ID.ENERGY)].Add_Tile_To_System("Transmitters", tile.tile);
             }
             if (tile.property_data.power_generation >= 1.0f) // Adds tiles that generate power to the energy system
             {
-                tile_systems[0].Add_Tile_To_System("Generators", tile.tile);
+                tile_systems[(int)(SYSTEM_ID.ENERGY)].Add_Tile_To_System("Generators", tile.tile);
+            }
+            if (tile.property_data.openility >= 1.0f) // Adds tiles that generate power to the energy system
+            {
+                tile_systems[(int)(SYSTEM_ID.ENERGY)].Add_Tile_To_System("Receptors", tile.tile);
             }
 
             foreach (var sys in tile.system_data)

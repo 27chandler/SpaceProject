@@ -86,11 +86,11 @@ public class Energy_System : Tile_System
             {
                 if (is_ship_mode)
                 {
-                    input_receptor = new Door(i_pos, tm.Grab_Ship_Layer(i_tile));
+                    input_receptor = new Door(i_pos, i_tile, tm.Grab_Ship_Layer(i_tile));
                 }
                 else
                 {
-                    input_receptor = new Door(i_pos, tm.Grab_Layer(i_tile));
+                    input_receptor = new Door(i_pos, i_tile, tm.Grab_Layer(i_tile));
                 }
             }
 
