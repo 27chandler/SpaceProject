@@ -70,6 +70,7 @@ public class Energy_System : Tile_System
         }
         else if (Check_Tiletype(system_tiles["Generators"], i_tile))
         {
+            Debug.Log("Generator Added");
             generator_dictionary.Add(i_pos, 1);
             is_valid = true;
         }

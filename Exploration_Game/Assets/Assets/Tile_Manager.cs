@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -144,6 +144,10 @@ public class Tile_Manager : MonoBehaviour
             if (tile.property_data.conductivity >= 1.0f)
             {
                 tile_systems[0].Add_Tile_To_System("Transmitters", tile.tile);
+            }
+            if (tile.property_data.power_generation >= 1.0f) // Adds tiles that generate power to the energy system
+            {
+                tile_systems[0].Add_Tile_To_System("Generators", tile.tile);
             }
 
             foreach (var sys in tile.system_data)

@@ -542,9 +542,7 @@ MonoBehaviour:
   tile_systems:
   - {fileID: 212982171}
   - {fileID: 1892769852}
-  - {fileID: 1069010770}
   - {fileID: 566537205}
-  - {fileID: 1078939916}
   ship_tile_layer_data:
   - tile: {fileID: 11400000, guid: a0d6849510cb6ad4f94e3f76a194df7d, type: 2}
     tilemap: {fileID: 650142689}
