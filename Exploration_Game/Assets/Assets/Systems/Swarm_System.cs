@@ -7,12 +7,13 @@ public class Swarm_System : Tile_System
 {
     private Tile_Manager tm;
     private Dictionary<Vector3Int, Spawner_Info> swarm_dictionary = new Dictionary<Vector3Int, Spawner_Info>();
-    private const float SPREAD_DELAY = 100.0f;
+    private const float SPREAD_DELAY = 30.0f;
 
     public class Spawner_Info
     {
         public float spread_percentage;
         public float spread_speed;
+        public TileBase tile;
     }
 
     void Start()
@@ -52,6 +53,7 @@ public class Swarm_System : Tile_System
                 Spawner_Info temp_spawner_info = new Spawner_Info();
                 temp_spawner_info.spread_percentage = 0.0f;
                 temp_spawner_info.spread_speed = Random.Range(1.0f, 3.0f);
+                temp_spawner_info.tile = i_tile;
                 swarm_dictionary.Add(i_pos, temp_spawner_info);
             }
         }
@@ -73,14 +75,16 @@ public class Swarm_System : Tile_System
         TileBase spawner_tile;
         Tilemap spawner_tilemap;
 
+        //spawner_tile = system_tiles["Spawner"][0];
+        spawner_tile = swarm_dictionary[i_pos].tile;
+
         if (is_ship_mode)
         {
-            spawner_tile = system_tiles["Spawner"][0];
+            //spawner_tile = system_tiles["Spawner"][0];
             spawner_tilemap = tm.Grab_Ship_Layer(spawner_tile);
         }
         else
         {
-            spawner_tile = system_tiles["Spawner"][0];
             spawner_tilemap = tm.Grab_Layer(spawner_tile);
         }
 
