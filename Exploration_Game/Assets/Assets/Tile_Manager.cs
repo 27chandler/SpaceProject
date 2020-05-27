@@ -144,7 +144,7 @@ public class Tile_Manager : MonoBehaviour
     {
         foreach (var tile in tile_layer_data)
         {
-            if (tile.property_data.conductivity >= 1.0f)
+            if (tile.property_data.conductivity >= 1.0f) // Adds tiles that can conduct energy to the energy system
             {
                 tile_systems[(int)(SYSTEM_ID.ENERGY)].Add_Tile_To_System("Transmitters", tile.tile);
             }
@@ -152,7 +152,7 @@ public class Tile_Manager : MonoBehaviour
             {
                 tile_systems[(int)(SYSTEM_ID.ENERGY)].Add_Tile_To_System("Generators", tile.tile);
             }
-            if (tile.property_data.openility >= 1.0f) // Adds tiles that generate power to the energy system
+            if (tile.property_data.openility >= 1.0f) // Adds tiles that can be opened as doors to the energy system
             {
                 tile_systems[(int)(SYSTEM_ID.ENERGY)].Add_Tile_To_System("Receptors", tile.tile);
             }
