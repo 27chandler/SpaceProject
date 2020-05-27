@@ -7,7 +7,7 @@ using UnityEngine.Tilemaps;
 public class Tile_Manager : MonoBehaviour
 {
     // Enum for types of systems present in the game
-    private enum SYSTEM_ID { ENERGY = 0, SHIP = 1, SWARM = 2 };
+    private enum SYSTEM_ID { ENERGY = 0, SHIP = 1, SWARM = 2, LIQUID = 3 };
 
     // Stores properties for a tiletype
     [Serializable]
@@ -155,6 +155,10 @@ public class Tile_Manager : MonoBehaviour
             if (tile.property_data.openility >= 1.0f) // Adds tiles that can be opened as doors to the energy system
             {
                 tile_systems[(int)(SYSTEM_ID.ENERGY)].Add_Tile_To_System("Receptors", tile.tile);
+            }
+            if (tile.property_data.spread_value > 0.0f) // Adds tiles that can be opened as doors to the energy system
+            {
+                tile_systems[(int)(SYSTEM_ID.SWARM)].Add_Tile_To_System("Spawner", tile.tile);
             }
 
             foreach (var sys in tile.system_data)
