@@ -8,8 +8,9 @@ public class Liquid_System : Tile_System
     private Tile_Manager tm;
 
     [SerializeField] private Tilemap blocking_tilemap;
+    [SerializeField] private Tilemap flooring_tilemap;
 
-    [SerializeField][Range(0.0f,1.0f)] private float min_water,max_water,min_differential; 
+    [SerializeField][Range(0.0f,1.0f)] private float min_water,max_water,min_differential,drying_value; 
 
     private Dictionary<Vector3Int, Liquid_Info> liquid_dictionary = new Dictionary<Vector3Int, Liquid_Info>();
     [SerializeField] private float SPREAD_DELAY = 2.0f;
@@ -52,7 +53,31 @@ public class Liquid_System : Tile_System
             }
         }
 
+        Evaporate();
+
         Set_Tile_Colours();
+    }
+
+    private void Evaporate()
+    {
+        List<Vector3Int> liquid_buffer = new List<Vector3Int>();
+
+        foreach (var liquid_tile in liquid_dictionary)
+        {
+            if (liquid_tile.Value.liquid_amount < drying_value)
+            {
+                liquid_buffer.Add(liquid_tile.Key);
+            }
+            else if (flooring_tilemap.GetTile(liquid_tile.Key) == null)
+            {
+                liquid_buffer.Add(liquid_tile.Key);
+            }
+        }
+
+        foreach (var removal in liquid_buffer)
+        {
+            tm.Remove_Tile(removal, liquid_dictionary[removal].tile);
+        }
     }
 
     private void Set_Tile_Colours()
