@@ -8,7 +8,7 @@ public class Energy_Receptor
 
     protected int activation_cost = 2;
 
-    private int energy_level = 0;
+    protected int energy_level = 0;
     private int max_energy_level = 20;
     protected Vector3Int position;
 
@@ -40,6 +40,11 @@ public class Energy_Receptor
             energy_level -= i_cost;
             Activation_Behaviour();
         }
+    }
+
+    public virtual void Destroy()
+    {
+        
     }
 
     public virtual void Tile_Update()

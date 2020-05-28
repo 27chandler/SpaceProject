@@ -37,6 +37,8 @@ public class Movement : MonoBehaviour
     [SerializeField] private string clockwise_event;
     [SerializeField] private string anticlockwise_event;
 
+    private Quaternion rotation;
+
     public void Set_Independant_Movement(bool i_flag)
     {
         has_independant_movement = i_flag;
@@ -45,6 +47,11 @@ public class Movement : MonoBehaviour
     public void Set_Movement_Speed(float i_speed)
     {
         movement_speed = i_speed;
+    }
+
+    public void Set_Rotation(Quaternion i_rotation)
+    {
+        rotation = i_rotation;
     }
 
     // Start is called before the first frame update
@@ -73,42 +80,45 @@ public class Movement : MonoBehaviour
         {
             movement_speed = default_speed;
         }
-
-        //if (has_moved_this_frame && parent_rigidbody != null)
-        //{
-        //    Set_Anchor_Point();
-        //}
     }
 
     void Move_Forward()
     {
+        Vector3 forward = rotation * Vector3.up;
+
         if (has_independant_movement)
         {
-            rb.AddRelativeForce(Vector3.up * movement_speed);
+            rb.AddRelativeForce(forward * movement_speed);
         }
     }
 
     void Move_Backward()
     {
+        Vector3 forward = rotation * Vector3.up;
+
         if (has_independant_movement)
         {
-            rb.AddRelativeForce((-Vector3.up) * movement_speed);
+            rb.AddRelativeForce((-forward) * movement_speed);
         }
     }
 
     void Move_Left()
     {
+        Vector3 right = rotation * Vector3.right;
+
         if (has_independant_movement)
         {
-            rb.AddRelativeForce((-Vector3.right) * movement_speed);
+            rb.AddRelativeForce((-right) * movement_speed);
         }
     }
 
     void Move_Right()
     {
+        Vector3 right = rotation * Vector3.right;
+
         if (has_independant_movement)
         {
-            rb.AddRelativeForce(Vector3.right * movement_speed);
+            rb.AddRelativeForce(right * movement_speed);
         }
     }
 

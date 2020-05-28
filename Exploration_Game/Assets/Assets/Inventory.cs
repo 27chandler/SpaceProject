@@ -9,6 +9,15 @@ public class Inventory : MonoBehaviour
 {
     private Tile_Manager tm;
 
+    [Serializable]
+    public class Inventory_Slot
+    {
+        public TileBase tile;
+        public int amount;
+    }
+    private List<Inventory_Slot> tile_inventory = new List<Inventory_Slot>();
+    private int slot_selection = 0;
+
     [SerializeField] private Follow_Mouse cursor_obj;
     [SerializeField] private Tile_System tile_sys;
 
@@ -34,12 +43,53 @@ public class Inventory : MonoBehaviour
 
         default_grid = place_tilemap.GetComponentInParent<Grid>();
         ship_grid = alternate_place_tilemap.GetComponentInParent<Grid>();
+
+        Init_Inventory_Slots();
+
+    }
+
+    private void Init_Inventory_Slots()
+    {
+        List<TileBase> tile_list = tm.Grab_All_Tiletypes();
+
+        foreach (var tiles in tile_list)
+        {
+            tile_inventory.Add(new Inventory_Slot { tile = tiles, amount = 100 });
+        }
+    }
+
+    private void Selection_Update()
+    {
+        // Controls for moving between inventory selections
+        if (Input.mouseScrollDelta.y < 0.0f)
+        {
+            slot_selection -= 1;
+        }
+        if (Input.mouseScrollDelta.y > 0.0f)
+        {
+            slot_selection += 1;
+        }
+        //
+
+        // Forces the slot selection to roll over back to the other side of the selection
+        if (slot_selection < 0)
+        {
+            slot_selection = tile_inventory.Count - 1;
+        }
+
+        if (slot_selection >= tile_inventory.Count)
+        {
+            slot_selection = 0;
+        }
+        //
     }
 
     // Update is called once per frame
     void Update()
     {
-        inventory_debug_show.text = "Wires: " + tile_count;
+        Selection_Update();
+
+        inventory_debug_show.text = "Slot: " + slot_selection + ": " + tile_inventory[slot_selection].amount;
 
         Vector3Int rounded_cursor_pos = new Vector3Int();
         rounded_cursor_pos.x = Mathf.FloorToInt(cursor_obj.Get_World_Position().x);
@@ -63,7 +113,7 @@ public class Inventory : MonoBehaviour
 
         if (distance < 1.0f)
         {
-            if ((Input.GetMouseButton(0)) && (tile_count > 0))
+            if ((Input.GetMouseButton(0)) && (tile_inventory[slot_selection].amount > 0))
             {
                 if (alternate_floor_tilemap.GetTile(ship_grid.WorldToCell(cursor_obj.Get_World_Position())) != null)
                 {
@@ -75,10 +125,10 @@ public class Inventory : MonoBehaviour
                 }
                 else if (floor_tilemap.GetTile(default_grid.WorldToCell(cursor_obj.Get_World_Position())) != null)
                 {
-                    if (place_tilemap.GetTile(default_grid.WorldToCell(cursor_obj.Get_World_Position())) == null)
+                    if (tm.Grab_Layer(tile_inventory[slot_selection].tile).GetTile(default_grid.WorldToCell(cursor_obj.Get_World_Position())) == null)
                     {
-                        tm.Add_Tile(default_grid.WorldToCell(cursor_obj.Get_World_Position()), place_tile);
-                        tile_count--;
+                        tm.Add_Tile(default_grid.WorldToCell(cursor_obj.Get_World_Position()), tile_inventory[slot_selection].tile);
+                        tile_inventory[slot_selection].amount --;
                     }
                 }
             }
@@ -95,10 +145,11 @@ public class Inventory : MonoBehaviour
                 }
                 else if (floor_tilemap.GetTile(default_grid.WorldToCell(cursor_obj.Get_World_Position())) != null)
                 {
-                    if (place_tilemap.GetTile(default_grid.WorldToCell(cursor_obj.Get_World_Position())) == place_tile)
+                    TileBase temp = tm.Grab_Layer(tile_inventory[slot_selection].tile).GetTile(default_grid.WorldToCell(cursor_obj.Get_World_Position()));
+                    if (tm.Grab_Layer(tile_inventory[slot_selection].tile).GetTile(default_grid.WorldToCell(cursor_obj.Get_World_Position())) == tile_inventory[slot_selection].tile)
                     {
-                        tm.Remove_Tile(default_grid.WorldToCell(cursor_obj.Get_World_Position()), place_tile);
-                        tile_count++;
+                        tm.Remove_Tile(default_grid.WorldToCell(cursor_obj.Get_World_Position()), tile_inventory[slot_selection].tile);
+                        tile_inventory[slot_selection].amount++;
                     }
                 }
             }

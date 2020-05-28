@@ -16,6 +16,7 @@ public class Energy_System : Tile_System
     public class Energy_Tile
     {
         public int energy_level;
+        public TileBase tiletype;
         public DIRECTION transfer_direction;
         public DIRECTION energy_origin;
 
@@ -54,6 +55,7 @@ public class Energy_System : Tile_System
 
     public override void Add_Tile(Vector3Int i_pos, TileBase i_tile)
     {
+        Debug.Log("Tile added to energy");
         bool is_valid = false;
 
         if (tm == null)
@@ -63,11 +65,12 @@ public class Energy_System : Tile_System
 
         if (Check_Tiletype(system_tiles["Transmitters"], i_tile))
         {
-            energy_dictionary.Add(i_pos, Create_Energy_Tile());
+            energy_dictionary.Add(i_pos, Create_Energy_Tile(i_tile));
             is_valid = true;
         }
         else if (Check_Tiletype(system_tiles["Generators"], i_tile))
         {
+            Debug.Log("Generator Added");
             generator_dictionary.Add(i_pos, 1);
             is_valid = true;
         }
@@ -77,18 +80,17 @@ public class Energy_System : Tile_System
 
             if (tm.Check_Layer_Name(i_tile,"Wheel"))
             {
-                Debug.Log("TRIGGERED");
                 input_receptor = new Ship_Wheel(i_pos, tm.Grab_Ship_Layer(i_tile));
             }
             else
             {
                 if (is_ship_mode)
                 {
-                    input_receptor = new Door(i_pos, tm.Grab_Ship_Layer(i_tile));
+                    input_receptor = new Door(i_pos, i_tile, tm.Grab_Ship_Layer(i_tile));
                 }
                 else
                 {
-                    input_receptor = new Door(i_pos, tm.Grab_Layer(i_tile));
+                    input_receptor = new Door(i_pos, i_tile, tm.Grab_Layer(i_tile));
                 }
             }
 
@@ -140,6 +142,7 @@ public class Energy_System : Tile_System
         {
             if (receptor_dictionary.ContainsKey(i_pos))
             {
+                receptor_dictionary[i_pos].Destroy();
                 receptor_dictionary.Remove(i_pos);
             }
             else
@@ -149,9 +152,10 @@ public class Energy_System : Tile_System
         }
     }
 
-    private Energy_Tile Create_Energy_Tile()
+    private Energy_Tile Create_Energy_Tile(TileBase i_tile)
     {
         Energy_Tile temp_energy = new Energy_Tile();
+        temp_energy.tiletype = i_tile;
         temp_energy.energy_level = 0;
         temp_energy.energy_origin = DIRECTION.NULL;
         temp_energy.transfer_direction = DIRECTION.NULL;
@@ -168,22 +172,31 @@ public class Energy_System : Tile_System
 
         int total_energy_count = 0;
         Tilemap colour_set_tilemap;
-        if (is_ship_mode)
-        {
-            colour_set_tilemap = tm.Grab_Ship_Layer(system_tiles["Transmitters"][0]);
-        }
-        else
-        {
-            colour_set_tilemap = tm.Grab_Layer(system_tiles["Transmitters"][0]);
-        }
+        //if (is_ship_mode)
+        //{
+        //    colour_set_tilemap = tm.Grab_Ship_Layer(system_tiles["Transmitters"][0]);
+        //}
+        //else
+        //{
+        //    colour_set_tilemap = tm.Grab_Layer(system_tiles["Transmitters"][0]);
+        //}
 
         foreach (var wire in energy_dictionary)
         {
+            if (is_ship_mode)
+            {
+                colour_set_tilemap = tm.Grab_Ship_Layer(wire.Value.tiletype);
+            }
+            else
+            {
+                colour_set_tilemap = tm.Grab_Layer(wire.Value.tiletype);
+            }
+
+            colour_set_tilemap.SetTileFlags(wire.Key, TileFlags.None);
+
             colour_set_tilemap.SetColor(wire.Key, intensity_colors[wire.Value.energy_level]);
             total_energy_count += wire.Value.energy_level;
         }
-
-        //Debug.Log(total_energy_count);
 
         if (burst_timer >= energy_burst_interval)
         {
@@ -277,7 +290,6 @@ public class Energy_System : Tile_System
 
                 if (((change_dir & return_dir) == change_dir) && (((change_dir & i_tile.energy_origin) != i_tile.energy_origin) || (i_tile.energy_origin == DIRECTION.NULL)))
                 {
-                    //Debug.Log(change_dir);
                     i_tile.transfer_direction = change_dir;
                     has_completed = true;
                     counter = 4;
@@ -298,14 +310,10 @@ public class Energy_System : Tile_System
                 
                 if (!Send_To_Receptor(i_pos, i_tile.energy_level))
                 {
-                    Debug.Log("Energy Dissipated: " + i_tile.energy_level);
+                    //Debug.Log("Energy Dissipated: " + i_tile.energy_level);
                 }
             }
-
-            //if (change_dir )
         }
-
-        //Debug.Log(energy_dictionary[new Vector3Int(3, 0, 0)].transfer_direction);
 
         return return_dir;
     }
@@ -322,7 +330,6 @@ public class Energy_System : Tile_System
 
     private void Transfer_Energy(Vector3Int i_pos,int i_amount,DIRECTION i_dir)
     {
-        //Debug.Log(i_dir);
         Vector3Int transfer_position = new Vector3Int();
         if (i_dir == DIRECTION.UP)
         {
@@ -345,8 +352,6 @@ public class Energy_System : Tile_System
             Initiate_Transfer(energy_buffer,transfer_position, DIRECTION.RIGHT, i_dir, i_amount,true);
         }
 
-        //Debug.Log(i_dir);
-
         if (i_dir != DIRECTION.NULL) 
         {
             Initiate_Transfer(energy_subtraction_buffer,i_pos, energy_dictionary[i_pos].energy_origin, energy_dictionary[i_pos].transfer_direction,i_amount,false);
@@ -355,7 +360,6 @@ public class Energy_System : Tile_System
 
     private void Initiate_Transfer(Dictionary<Vector3Int, Energy_Tile> i_buffer, Vector3Int i_transfer_pos, DIRECTION i_origin_dir, DIRECTION i_transfer_direction, int i_delta,bool is_cumulative)
     {
-        //Debug.Log("TRANSFER");
         Energy_Tile new_tile = new Energy_Tile();
         if (is_cumulative)
         {
@@ -367,6 +371,7 @@ public class Energy_System : Tile_System
         }
 
         new_tile.energy_origin = i_origin_dir;
+        new_tile.tiletype = energy_dictionary[i_transfer_pos].tiletype;
         new_tile.has_changed_this_step = false;
         new_tile.transfer_direction = energy_dictionary[i_transfer_pos].transfer_direction;
 
@@ -418,6 +423,7 @@ public class Energy_System : Tile_System
             {
                 Energy_Tile new_tile = new Energy_Tile();
                 new_tile.energy_level = energy_dictionary[generator.Key].energy_level + 1;
+                new_tile.tiletype = energy_dictionary[generator.Key].tiletype;
                 new_tile.energy_origin = DIRECTION.NULL;
                 new_tile.has_changed_this_step = false;
 
@@ -430,6 +436,14 @@ public class Energy_System : Tile_System
                     energy_buffer.Add(generator.Key, new_tile);
                 }
             }
+        }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        foreach (var tile in energy_dictionary)
+        {
+            Gizmos.DrawCube(tile.Key, new Vector3(1.0f, 1.0f, 1.0f));
         }
     }
 }

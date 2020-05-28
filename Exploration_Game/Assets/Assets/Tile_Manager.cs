@@ -6,6 +6,27 @@ using UnityEngine.Tilemaps;
 
 public class Tile_Manager : MonoBehaviour
 {
+    // Enum for types of systems present in the game
+    private enum SYSTEM_ID { ENERGY = 0, SHIP = 1, SWARM = 2, LIQUID = 3 };
+
+    // Stores properties for a tiletype
+    [Serializable]
+    public struct PropertyData
+    {
+        public float conductivity; // Conducitivity measures if a tile can carry energy to other conductive tiles
+        public float hardness;
+        public float openility;
+        public float power_generation;
+        public float thrust;
+        public float ship_blocker;
+        public float spread_value;
+    };
+
+
+    private Dictionary<Vector3Int, PropertyData> all_tiles = new Dictionary<Vector3Int, PropertyData>();
+
+    [SerializeField] private Tilemap test_tilemap;
+
     public static bool is_inited = false;
 
     [Serializable]
@@ -13,6 +34,7 @@ public class Tile_Manager : MonoBehaviour
     {
         public TileBase tile;
         public Tilemap tilemap;
+        public PropertyData property_data;
         public List<System_Layer> system_data;
     }
 
@@ -55,6 +77,8 @@ public class Tile_Manager : MonoBehaviour
 
     void Init()
     {
+        Populate_World_Dictionary();
+
         Add_Tile_Types_To_Systems();
         Add_World_Tiles_To_Systems();
 
@@ -62,6 +86,17 @@ public class Tile_Manager : MonoBehaviour
         {
             sys.enabled = true;
         }
+    }
+
+    public List<TileBase> Grab_All_Tiletypes()
+    {
+        List<TileBase> return_tiles = new List<TileBase>();
+
+        foreach (var tile_data in tile_layer_data)
+        {
+            return_tiles.Add(tile_data.tile);
+        }
+        return return_tiles;
     }
 
     public void Init_Ship_Systems()
@@ -75,12 +110,60 @@ public class Tile_Manager : MonoBehaviour
         Add_Ship_World_Tiles_To_Systems();
     }
 
+    private void Populate_World_Dictionary()
+    {
+        foreach (var tile_pos in test_tilemap.cellBounds.allPositionsWithin)
+        {
+            all_tiles.Add(tile_pos, Grab_Property_Data(test_tilemap.GetTile(tile_pos)));
+        }
+    }
+
+    // Retrieves the property data for a specific tile type
+    private PropertyData Grab_Property_Data(TileBase i_tile)
+    {
+        PropertyData return_data = new PropertyData();
+
+        if (i_tile == null)
+        {
+            return return_data;
+        }
+
+        foreach (var tile in tile_layer_data)
+        {
+            if (tile.tile == i_tile)
+            {
+                return tile.property_data;
+            }
+        }
+
+        Debug.LogError("Invalid tile in property data");
+        return return_data;
+    }
+
     private void Add_Tile_Types_To_Systems()
     {
         foreach (var tile in tile_layer_data)
         {
+            if (tile.property_data.conductivity >= 1.0f) // Adds tiles that can conduct energy to the energy system
+            {
+                tile_systems[(int)(SYSTEM_ID.ENERGY)].Add_Tile_To_System("Transmitters", tile.tile);
+            }
+            if (tile.property_data.power_generation >= 1.0f) // Adds tiles that generate power to the energy system
+            {
+                tile_systems[(int)(SYSTEM_ID.ENERGY)].Add_Tile_To_System("Generators", tile.tile);
+            }
+            if (tile.property_data.openility >= 1.0f) // Adds tiles that can be opened as doors to the energy system
+            {
+                tile_systems[(int)(SYSTEM_ID.ENERGY)].Add_Tile_To_System("Receptors", tile.tile);
+            }
+            if (tile.property_data.spread_value > 0.0f) // Adds tiles that can be opened as doors to the energy system
+            {
+                tile_systems[(int)(SYSTEM_ID.SWARM)].Add_Tile_To_System("Spawner", tile.tile);
+            }
+
             foreach (var sys in tile.system_data)
             {
+
                 sys.system.Add_Tile_To_System(sys.layer_name, tile.tile);
             }
         }
@@ -98,6 +181,16 @@ public class Tile_Manager : MonoBehaviour
                     {
                         Add_Tile(tile_pos, tile.tile);
                     }
+
+
+
+                    //
+                    //if (all_tiles[tile_pos].conductivity >= 1.0f)
+                    //{
+                    //    Debug.Log("Added tile to energy");
+                    //    tile_systems[0].Add_Tile(tile_pos, tile.tilemap.GetTile(tile_pos));
+                    //}
+                    //
                 }
             //}
         }
@@ -213,6 +306,43 @@ public class Tile_Manager : MonoBehaviour
         return null;
     }
 
+    private List<Tile_System> Grab_Relevant_Systems(TileBase i_tile)
+    {
+        List<Tile_System> return_systems = new List<Tile_System>();
+
+        foreach (var sys in tile_systems)
+        {
+            if (sys.Check_System_Tiles(i_tile))
+            {
+                return_systems.Add(sys);
+            }
+        }
+
+        return return_systems;
+    }
+
+    public void Add_Tile(Vector3Int i_pos, TileBase i_tile,Quaternion i_rotation)
+    {
+        Add_Tile(i_pos, i_tile);
+
+        Tilemap target_tilemap = new Tilemap();
+
+        foreach (var info in tile_layer_data)
+        {
+            if (info.tile == i_tile)
+            {
+                target_tilemap = info.tilemap;
+            }
+        }
+
+        if (target_tilemap != null)
+        {
+            TileBase tile = target_tilemap.GetTile(i_pos);
+            target_tilemap.SetTransformMatrix(i_pos, Matrix4x4.TRS(Vector3.zero, i_rotation, Vector3.one));
+            Debug.Log("Rotated");
+        }
+    }
+
     public void Add_Tile(Vector3Int i_pos, TileBase i_tile)
     {
         Tilemap target_tilemap = new Tilemap();
@@ -222,10 +352,13 @@ public class Tile_Manager : MonoBehaviour
             if (info.tile == i_tile)
             {
                 target_tilemap = info.tilemap;
+                Remove_Tile(i_pos, target_tilemap.GetTile(i_pos));
 
-                foreach (var sys in info.system_data)
+                List<Tile_System> systems = Grab_Relevant_Systems(i_tile);
+
+                foreach (var sys in systems)
                 {
-                    sys.system.Add_Tile(i_pos, i_tile);
+                    sys.Add_Tile(i_pos, i_tile);
                 }
             }
         }
@@ -268,6 +401,27 @@ public class Tile_Manager : MonoBehaviour
         }
     }
 
+    public void Ship_Add_Tile(Vector3Int i_pos, TileBase i_tile, Quaternion i_rotation)
+    {
+        Ship_Add_Tile(i_pos, i_tile);
+
+        Tilemap target_tilemap = new Tilemap();
+
+        foreach (var info in ship_tile_layer_data)
+        {
+            if (info.tile == i_tile)
+            {
+                target_tilemap = info.tilemap;
+            }
+        }
+
+        if (target_tilemap != null)
+        {
+            TileBase tile = target_tilemap.GetTile(i_pos);
+            target_tilemap.SetTransformMatrix(i_pos, Matrix4x4.TRS(Vector3.zero, i_rotation, Vector3.one));
+        }
+    }
+
     public void Ship_Add_Tile(Vector3Int i_pos, TileBase i_tile)
     {
         Tilemap target_tilemap = new Tilemap();
@@ -277,6 +431,7 @@ public class Tile_Manager : MonoBehaviour
             if (info.tile == i_tile)
             {
                 target_tilemap = info.tilemap;
+                Ship_Remove_Tile(i_pos, target_tilemap.GetTile(i_pos));
 
                 foreach (var sys in info.system_data)
                 {

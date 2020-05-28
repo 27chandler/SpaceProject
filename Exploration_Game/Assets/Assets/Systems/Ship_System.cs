@@ -12,6 +12,8 @@ public class Ship_System : Tile_System
     [SerializeField] private Transform player_transform;
     [SerializeField] private Movement player_movement;
 
+    private bool player_self_movement = true;
+
     [SerializeField] private Rigidbody2D ship_rb;
     private float ship_default_angular_drag;
     [SerializeField] private Movement movement;
@@ -43,6 +45,23 @@ public class Ship_System : Tile_System
         Find_Wheel();
     }
 
+    public void Toggle_Player_Movement()
+    {
+        player_self_movement = !player_self_movement;
+
+        ship_movement.Set_Independant_Movement(!player_self_movement);
+        player_movement.Set_Independant_Movement(player_self_movement);
+
+        if (player_self_movement)
+        {
+            dock_ship_event.Invoke();
+        }
+        else
+        {
+            control_ship_event.Invoke();
+        }
+    }
+
     protected override void System_Update()
     {
         if (!is_ship)
@@ -51,13 +70,7 @@ public class Ship_System : Tile_System
             ship_rb.position = new Vector2(0.0f, 0.0f);
             ship_rb.angularVelocity = 0.0f;
             ship_rb.rotation = 0.0f;
-        }
-
-        if (is_ship_control_activated)
-        {
-
-        }
-        
+        }      
 
         if (is_ship_control_activated)
         {
@@ -72,13 +85,20 @@ public class Ship_System : Tile_System
 
                 Find_Wheel();
 
+                Tilemap wheel_tilemap = tm.Grab_Layer(system_tiles["Wheel"][0]);
+                ship_movement.Set_Rotation(wheel_tilemap.GetTransformMatrix(wheel_pos).rotation);
+                Debug.Log("Rotation: " + wheel_tilemap.GetTransformMatrix(wheel_pos).rotation);
+
                 ship_tile_positions.Clear();
                 Convert_To_Ship(wheel_pos);
                 Copy_Touching_Layers(tilemaps, ship_tilemaps, -1, false);
 
                 movement.Set_Parent(ship_rb);
-                ship_movement.enabled = true;
-                player_movement.Set_Independant_Movement(false);
+
+
+                player_self_movement = false;
+                ship_movement.enabled = !player_self_movement;
+                player_movement.Set_Independant_Movement(player_self_movement);
 
                 is_converting_to_ship = false;
                 is_ship = true;
@@ -212,31 +232,6 @@ public class Ship_System : Tile_System
 
             foreach (var pos in ship_tile_positions)
             {
-
-                //Vector3Int check_pos = pos.Key + new Vector3Int(1, 0, 0);
-                //if ((!ship_tile_positions.ContainsKey(check_pos)) && (tilemaps[tilemap_index].GetTile(check_pos) != null))
-                //{
-                //    edge_tiles.Add(check_pos);
-                //}
-
-                //check_pos = pos.Key + new Vector3Int(-1, 0, 0);
-                //if ((!ship_tile_positions.ContainsKey(check_pos)) && (tilemaps[tilemap_index].GetTile(check_pos) != null))
-                //{
-                //    edge_tiles.Add(check_pos);
-                //}
-
-                //check_pos = pos.Key + new Vector3Int(0, 1, 0);
-                //if ((!ship_tile_positions.ContainsKey(check_pos)) && (tilemaps[tilemap_index].GetTile(check_pos) != null))
-                //{
-                //    edge_tiles.Add(check_pos);
-                //}
-
-                //check_pos = pos.Key + new Vector3Int(0, -1, 0);
-                //if ((!ship_tile_positions.ContainsKey(check_pos)) && (tilemaps[tilemap_index].GetTile(check_pos) != null))
-                //{
-                //    edge_tiles.Add(check_pos);
-                //}
-
                 Vector3Int check_pos = pos.Key + new Vector3Int(1, 0, 0);
 
                 bool is_adjacent_valid = false;
@@ -448,13 +443,13 @@ public class Ship_System : Tile_System
                 pos.x = Mathf.RoundToInt(float_pos.x);
                 pos.y = Mathf.RoundToInt(float_pos.y);
 
-                tm.Add_Tile(pos, i_from[i_index].GetTile(tile.Key));
+                tm.Add_Tile(pos, i_from[i_index].GetTile(tile.Key), ship_grid.transform.rotation);
                 tm.Ship_Remove_Tile(tile.Key, i_from[i_index].GetTile(tile.Key));
 
             }
             else
             {
-                tm.Ship_Add_Tile(pos, i_from[i_index].GetTile(tile.Key));
+                tm.Ship_Add_Tile(pos, i_from[i_index].GetTile(tile.Key), i_from[i_index].GetTransformMatrix(pos).rotation);
                 tm.Remove_Tile(tile.Key, i_from[i_index].GetTile(tile.Key));
             }
         }
@@ -480,7 +475,7 @@ public class Ship_System : Tile_System
                             pos.x = Mathf.RoundToInt(float_pos.x);
                             pos.y = Mathf.RoundToInt(float_pos.y);
 
-                            tm.Add_Tile(pos, i_from[index].GetTile(tile.Key));
+                            tm.Add_Tile(pos, i_from[index].GetTile(tile.Key), i_from[index].GetTransformMatrix(tile.Key).rotation * ship_grid.transform.rotation);
                             tm.Ship_Remove_Tile(tile.Key, i_from[index].GetTile(tile.Key));
                         }
                         else
@@ -501,7 +496,7 @@ public class Ship_System : Tile_System
                                 engine_power += 20.0f;
                             }
 
-                            tm.Ship_Add_Tile(pos, i_from[index].GetTile(tile.Key));
+                            tm.Ship_Add_Tile(pos, i_from[index].GetTile(tile.Key), i_from[index].GetTransformMatrix(pos).rotation);
                             tm.Remove_Tile(tile.Key, i_from[index].GetTile(tile.Key));
 
                         }

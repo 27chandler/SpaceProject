@@ -18,21 +18,23 @@ public class Door : Energy_Receptor
     private Tilemap target_tilemap;
     private Grid tile_grid;
 
-    public Door(Vector3Int i_tile_pos,Tilemap i_tilemap) : base(i_tile_pos)
+    public Door(Vector3Int i_tile_pos,TileBase i_tiletype,Tilemap i_tilemap) : base(i_tile_pos)
     {
         tm = GameObject.FindGameObjectWithTag("TileManager").GetComponent<Tile_Manager>();
 
         target_tilemap = i_tilemap;
-        open_door = tm.standard_door.inactive_tile;
-        closed_door = tm.standard_door.activate_tile;
+        //open_door = tm.standard_door.inactive_tile;
+        closed_door = i_tiletype;
 
         if (is_open)
         {
-            current_tile = open_door;
+            //current_tile = open_door;
+            target_tilemap.SetColor(position, new Color(1.0f, 1.0f, 1.0f, 0.3f));
         }
         else
         {
-            current_tile = closed_door;
+            //current_tile = closed_door;
+            target_tilemap.SetColor(position, Color.white);
         }
 
         target_tilemap.SetTile(position, current_tile);
@@ -56,10 +58,12 @@ public class Door : Energy_Receptor
         {
             if (is_open)
             {
-                current_tile = open_door;
+                //current_tile = open_door;
+                target_tilemap.SetColor(position, new Color(1.0f, 1.0f, 1.0f, 0.3f));
             }
             else
             {
+                target_tilemap.SetColor(position, Color.white);
                 current_tile = closed_door;
             }
 
@@ -89,12 +93,18 @@ public class Door : Energy_Receptor
     {
         is_open = !is_open;
 
+        target_tilemap.SetTileFlags(position, TileFlags.None);
+
         if (is_open)
         {
-            current_tile = open_door;
+            //current_tile = open_door;
+            target_tilemap.SetColor(position, new Color(0.0f, 0.0f, 1.0f, 0.3f));
+            target_tilemap.SetColliderType(position, Tile.ColliderType.None);
         }
         else
         {
+            target_tilemap.SetColliderType(position, Tile.ColliderType.Grid);
+            target_tilemap.SetColor(position, Color.white);
             current_tile = closed_door;
         }
 
